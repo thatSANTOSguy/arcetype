@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARCETYPE</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+            color: #e8e8e8;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Arial Black', sans-serif;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 1.5rem 2rem;
+            background: rgba(13, 13, 13, 0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #2a2a2a;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            pointer-events: auto;
+        }
+
+        .brand-name {
+            font-size: 1.5rem;
+            font-weight: 900;
+            letter-spacing: 0.2em;
+            color: #f5f5f5;
+        }
+
+        nav {
+            display: flex;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: #e8e8e8;
+            text-decoration: none;
+            font-size: 0.9rem;
+            letter-spacing: 0.1em;
+            transition: color 0.3s;
+            border-bottom: 2px solid transparent;
+            padding-bottom: 0.25rem;
+        }
+
+        nav a:hover {
+            color: #ff3333;
+            border-bottom-color: #ff3333;
+        }
+
+        .canvas-container {
+            height: calc(100vh - 80px);
+            display: flex;
+            position: relative;
+            padding: 2rem 1rem;
+            gap: 2rem;
+            align-items: stretch;
+            margin-top: 80px;
+            overflow: hidden;
+        }
+
+        .product-column {
+            width: 180px;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            overflow-y: auto;
+            max-height: calc(100vh - 150px);
+            scrollbar-width: thin;
+            scrollbar-color: #ff3333 #1a1a1a;
+            position: relative;
+            z-index: 10;
+            pointer-events: auto;
+        }
+
+        .product-column::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .product-column::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+
+        .product-column::-webkit-scrollbar-thumb {
+            background: #ff3333;
+            border-radius: 2px;
+        }
+
+        .product-item {
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            padding: 0.75rem;
+            cursor: grab;
+            transition: all 0.3s;
+            position: relative;
+            user-select: none;
+        }
+
+        .product-item:hover {
+            border-color: #ff3333;
+            box-shadow: 0 0 20px rgba(255, 51, 51, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .product-item.dragging {
+            cursor: grabbing;
+            opacity: 0.5;
+        }
+
+        .product-item.sold-out {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .product-placeholder {
+            width: 100%;
+            height: 150px;
+            background: #1a1a1a;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 0.8rem;
+        }
+
+        .product-name {
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.25rem;
+            color: #f5f5f5;
+        }
+
+        .product-price {
+            font-size: 0.7rem;
+            color: #ff3333;
+            letter-spacing: 0.05em;
+        }
+
+        .sold-out-badge {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            background: rgba(255, 51, 51, 0.9);
+            color: #fff;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.6rem;
+            letter-spacing: 0.1em;
+            font-weight: bold;
+        }
+
+        .center-canvas {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 0;
+            position: relative;
+        }
+
+        .main-canvas-area {
+            width: 100%;
+            max-width: 900px;
+            flex: 1;
+            position: relative;
+            background: rgba(26, 26, 26, 0.5);
+            border: 2px solid #2a2a2a;
+            min-height: 400px;
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        #sprayCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            cursor: crosshair;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .items-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 20;
+            pointer-events: none;
+        }
+
+        .color-picker {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            justify-content: center;
+        }
+
+        .canvas-selector {
+            display: flex;
+            gap: 0.6rem;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .canvas-btn {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #3a3a3a;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            background-size: cover;
+            background-position: center;
+            background-color: #1a1a1a;
+        }
+
+        .canvas-btn:hover {
+            transform: scale(1.15);
+            border-color: #f5f5f5;
+        }
+
+        .canvas-btn.active {
+            border-color: #f5f5f5;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+        }
+
+        .canvas-btn.active::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: #fff;
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+        }
+
+        .color-btn {
+            width: 40px;
+            height: 40px;
+            border: 2px solid #3a3a3a;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .color-btn:hover {
+            transform: scale(1.1);
+            border-color: #f5f5f5;
+        }
+
+        .color-btn.active {
+            border-color: #f5f5f5;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+        }
+
+        .color-btn.active::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #fff;
+        }
+
+        .canvas-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 1.5rem;
+            padding-bottom: 5rem;
+            gap: 1rem;
+            position: relative;
+            z-index: 10;
+            pointer-events: auto;
+        }
+
+        .dropped-item {
+            position: absolute;
+            cursor: move;
+            user-select: none;
+            transition: box-shadow 0.3s;
+            z-index: 5;
+            pointer-events: auto;
+        }
+
+        .dropped-item:hover {
+            box-shadow: 0 0 30px rgba(255, 51, 51, 0.5);
+            z-index: 10;
+        }
+
+        .dropped-item-img {
+            width: 100%;
+            height: 100%;
+            border: 2px solid #3a3a3a;
+            background: rgba(26, 26, 26, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1rem;
+        }
+
+        .dropped-item .remove-btn {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            width: 24px;
+            height: 24px;
+            background: #ff3333;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 0.8rem;
+            line-height: 1;
+            transition: all 0.3s;
+            z-index: 15;
+        }
+
+        .dropped-item .remove-btn:hover {
+            background: #ff0000;
+            transform: rotate(90deg);
+        }
+
+        .cart-button {
+            position: fixed;
+            bottom: 3rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #ff3333;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 2rem;
+            font-size: 0.9rem;
+            letter-spacing: 0.2em;
+            font-weight: 900;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 10px 40px rgba(255, 51, 51, 0.4);
+            opacity: 0;
+            visibility: hidden;
+            z-index: 50;
+            font-family: 'Arial Black', sans-serif;
+        }
+
+        .cart-button.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .cart-button:hover {
+            background: #ff0000;
+            transform: translateX(-50%) translateY(-2px);
+            box-shadow: 0 15px 50px rgba(255, 51, 51, 0.6);
+        }
+
+        .cart-count {
+            background: #fff;
+            color: #ff3333;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        .clear-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            z-index: 60;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .clear-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .clear-btn:hover .trash-icon {
+            stroke: #fff;
+        }
+
+        .trash-icon {
+            width: 32px;
+            height: 32px;
+            stroke: #e8e8e8;
+            stroke-width: 2;
+            fill: none;
+            transition: all 0.3s;
+        }
+
+        .clear-label {
+            font-size: 0.65rem;
+            color: #888;
+            letter-spacing: 0.1em;
+            font-weight: 300;
+            text-transform: uppercase;
+        }
+
+        /* Insiders Page */
+        .insiders-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #0d0d0d;
+            z-index: 200;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .insiders-page.active {
+            display: flex;
+        }
+
+        .insiders-content {
+            max-width: 600px;
+            text-align: center;
+        }
+
+        .insiders-headline {
+            font-size: clamp(2rem, 6vw, 4rem);
+            font-weight: 900;
+            letter-spacing: 0.15em;
+            color: #f5f5f5;
+            margin-bottom: 1rem;
+            font-family: 'Arial Black', sans-serif;
+        }
+
+        .insiders-subtext {
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            color: #888;
+            letter-spacing: 0.1em;
+            margin-bottom: 3rem;
+            line-height: 1.6;
+        }
+
+        .email-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .email-input {
+            background: transparent;
+            border: 2px solid #3a3a3a;
+            color: #f5f5f5;
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+            letter-spacing: 0.05em;
+            font-family: 'Courier New', monospace;
+            transition: all 0.3s;
+        }
+
+        .email-input:focus {
+            outline: none;
+            border-color: #ff3333;
+            box-shadow: 0 0 20px rgba(255, 51, 51, 0.3);
+        }
+
+        .email-input::placeholder {
+            color: #555;
+            letter-spacing: 0.1em;
+        }
+
+        .submit-btn {
+            background: #ff3333;
+            color: #fff;
+            border: none;
+            padding: 1.25rem 2rem;
+            font-size: 1rem;
+            letter-spacing: 0.2em;
+            font-weight: 900;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Arial Black', sans-serif;
+            text-transform: uppercase;
+        }
+
+        .submit-btn:hover {
+            background: #ff0000;
+            box-shadow: 0 10px 40px rgba(255, 51, 51, 0.6);
+        }
+
+        .close-insiders {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            background: transparent;
+            border: none;
+            color: #888;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-insiders:hover {
+            color: #fff;
+            transform: rotate(90deg);
+        }
+
+        /* About Page */
+        .about-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #0d0d0d;
+            z-index: 200;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .about-page.active {
+            display: flex;
+        }
+
+        .about-content {
+            max-width: 900px;
+            text-align: left;
+            padding: 2rem 0;
+        }
+
+        .about-pronunciation {
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            font-style: italic;
+            color: #888;
+            margin-bottom: 2rem;
+            letter-spacing: 0.05em;
+        }
+
+        .about-text {
+            font-size: clamp(0.85rem, 2vw, 1rem);
+            color: #e8e8e8;
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+            letter-spacing: 0.02em;
+        }
+
+        .about-text.highlight {
+            font-style: italic;
+            font-weight: 600;
+            margin-top: 2rem;
+        }
+
+        .close-about {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            background: transparent;
+            border: none;
+            color: #888;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-about:hover {
+            color: #fff;
+            transform: rotate(90deg);
+        }
+
+        @media (max-width: 1024px) {
+            .product-column {
+                width: 140px;
+            }
+
+            .product-placeholder {
+                height: 120px;
+            }
+
+            .main-canvas-area {
+                min-height: 350px;
+            }
+
+            .logo-placeholder {
+                width: 500px;
+                height: 160px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .product-column {
+                width: 80px;
+                gap: 1rem;
+                padding: 0.25rem;
+            }
+
+            .product-item {
+                padding: 0.4rem;
+            }
+
+            .product-placeholder {
+                height: 80px;
+                font-size: 0.65rem;
+            }
+
+            .product-name {
+                font-size: 0.55rem;
+            }
+
+            .product-price {
+                font-size: 0.55rem;
+            }
+
+            .main-canvas-area {
+                min-height: 300px;
+            }
+
+            .logo-placeholder {
+                width: 200px;
+                height: 80px;
+                font-size: 0.6rem;
+            }
+
+            .color-btn {
+                width: 28px;
+                height: 28px;
+            }
+
+            nav {
+                gap: 0.75rem;
+            }
+
+            nav a {
+                font-size: 0.65rem;
+            }
+
+            .brand-name {
+                font-size: 1.1rem;
+            }
+
+            header {
+                padding: 1rem 1rem;
+            }
+
+            .cart-button {
+                padding: 0.75rem 1.5rem;
+                font-size: 0.85rem;
+                bottom: 2rem;
+            }
+
+            .cart-count {
+                width: 20px;
+                height: 20px;
+                font-size: 0.7rem;
+            }
+
+            .canvas-container {
+                padding: 1rem 0.25rem;
+                margin-top: 60px;
+            }
+
+            .center-canvas {
+                padding: 1rem 0;
+            }
+
+            .canvas-controls {
+                padding-bottom: 6rem;
+            }
+
+            .clear-btn {
+                bottom: 1.5rem;
+                right: 1rem;
+            }
+
+            .trash-icon {
+                width: 36px;
+                height: 36px;
+            }
+
+            .clear-label {
+                font-size: 0.7rem;
+            }
+
+            /* Make dropped items smaller on mobile */
+            .dropped-item {
+                width: 130px !important;
+                height: 130px !important;
+            }
+
+            .dropped-item-img {
+                font-size: 0.75rem;
+            }
+
+            .remove-btn {
+                width: 20px !important;
+                height: 20px !important;
+                font-size: 0.7rem !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="brand-name">ARCETYPE</div>
+        <nav>
+            <a href="javascript:void(0)" data-page="canvas">CANVAS</a>
+            <a href="javascript:void(0)" data-page="archive">ARCHIVE</a>
+            <a href="javascript:void(0)" data-page="about">ABOUT</a>
+            <a href="javascript:void(0)" data-page="insiders">INSIDERS</a>
+        </nav>
+    </header>
+
+    <div class="canvas-container">
+        <div class="product-column" id="leftColumn"></div>
+
+        <div class="center-canvas">
+            <div class="canvas-selector">
+                <div class="canvas-btn active" data-canvas="1"></div>
+                <div class="canvas-btn" data-canvas="2"></div>
+                <div class="canvas-btn" data-canvas="3"></div>
+                <div class="canvas-btn" data-canvas="4"></div>
+                <div class="canvas-btn" data-canvas="5"></div>
+            </div>
+
+            <div class="main-canvas-area" id="mainCanvas">
+                <canvas id="sprayCanvas"></canvas>
+                <div class="items-layer" id="itemsLayer"></div>
+            </div>
+
+            <div class="canvas-controls">
+                <div class="color-picker">
+                    <div class="color-btn active" data-color="#ff3333" style="background: #ff3333;"></div>
+                    <div class="color-btn" data-color="#00ff88" style="background: #00ff88;"></div>
+                    <div class="color-btn" data-color="#3366ff" style="background: #3366ff;"></div>
+                    <div class="color-btn" data-color="#ffff00" style="background: #ffff00;"></div>
+                    <div class="color-btn" data-color="#ff00ff" style="background: #ff00ff;"></div>
+                </div>
+
+                <button class="clear-btn" id="clearSpray">
+                    <svg class="trash-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M10 11v6M14 11v6"/>
+                    </svg>
+                    <span class="clear-label">Clear Paint</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="product-column" id="rightColumn"></div>
+    </div>
+
+    <button class="cart-button" id="cartButton">
+        GO TO CART <span class="cart-count">0</span>
+    </button>
+
+    <!-- Insiders Page -->
+    <div class="insiders-page" id="insidersPage">
+        <button class="close-insiders" id="closeInsiders">×</button>
+        <div class="insiders-content">
+            <h1 class="insiders-headline">FOR THE INSIDERS...</h1>
+            <p class="insiders-subtext">
+                Early access. Exclusive drops. Behind the scenes.<br>
+                Join the inner circle.
+            </p>
+            <form class="email-form" id="emailForm">
+                <input 
+                    type="email" 
+                    class="email-input" 
+                    placeholder="YOUR EMAIL" 
+                    required
+                >
+                <button type="submit" class="submit-btn">Join Now</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- About Page -->
+    <div class="about-page" id="aboutPage">
+        <button class="close-about" id="closeAbout">×</button>
+        <div class="about-content">
+            <p class="about-pronunciation">archetype/ˈɑːkɪtʌɪp/</p>
+            
+            <p class="about-text">
+                Arcetype is about embracing the different gifts we were blessed with that help us understand who we are. For everyone there's a style to their story.
+            </p>
+
+            <p class="about-text">
+                Archetypes are like the built-in patterns in our brain which help us understand the world and act a certain way. Even before we know who we are or learn anything, we all have these deep inner feelings and behaviours that we're born with. They're kind of like instincts — they help guide us before we even think about it.
+            </p>
+
+            <p class="about-text highlight">
+                We're more than a brand — we're a movement. A community redefining what it means to evolve without losing yourself. Delivering the newest, boldest ways to elevate your lifestyle while staying true to your core
+            </p>
+        </div>
+    </div>
+
+    <script>
+        const products = [
+            { id: 1, name: 'VINTAGE TEE 001', price: '$45', soldOut: false },
+            { id: 2, name: 'CARGO PANTS 002', price: '$85', soldOut: false },
+            { id: 3, name: 'HOODIE 003', price: '$95', soldOut: false },
+            { id: 4, name: 'JACKET 004', price: '$125', soldOut: true },
+            { id: 5, name: 'SHORTS 005', price: '$55', soldOut: false },
+            { id: 6, name: 'SWEATPANTS 006', price: '$75', soldOut: false },
+            { id: 7, name: 'CAP 007', price: '$35', soldOut: false }
+        ];
+
+        const leftColumn = document.getElementById('leftColumn');
+        const rightColumn = document.getElementById('rightColumn');
+        const mainCanvas = document.getElementById('mainCanvas');
+        const itemsLayer = document.getElementById('itemsLayer');
+        const cartButton = document.getElementById('cartButton');
+
+        let cartItems = new Map();
+        let droppedItems = [];
+
+        products.forEach((product, index) => {
+            const productEl = createProductElement(product);
+            if (index % 2 === 0) {
+                leftColumn.appendChild(productEl);
+            } else {
+                rightColumn.appendChild(productEl);
+            }
+        });
+
+        function createProductElement(product) {
+            const div = document.createElement('div');
+            div.className = 'product-item' + (product.soldOut ? ' sold-out' : '');
+            div.draggable = !product.soldOut;
+            div.dataset.productId = product.id;
+            
+            div.innerHTML = `
+                <div class="product-placeholder">ITEM ${product.id}</div>
+                <div class="product-name">${product.name}</div>
+                <div class="product-price">${product.price}</div>
+                ${product.soldOut ? '<div class="sold-out-badge">SOLD OUT</div>' : ''}
+            `;
+
+            if (!product.soldOut) {
+                div.addEventListener('dragstart', handleDragStart);
+                div.addEventListener('dragend', handleDragEnd);
+                
+                div.addEventListener('touchstart', handleTouchStart);
+                div.addEventListener('touchmove', handleTouchMove);
+                div.addEventListener('touchend', handleTouchEnd);
+            }
+
+            return div;
+        }
+
+        let draggedElement = null;
+        let touchElement = null;
+        let touchClone = null;
+
+        function handleDragStart(e) {
+            draggedElement = this;
+            this.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'copy';
+        }
+
+        function handleDragEnd(e) {
+            this.classList.remove('dragging');
+        }
+
+        function handleTouchStart(e) {
+            touchElement = this;
+            const touch = e.touches[0];
+            
+            touchClone = this.cloneNode(true);
+            touchClone.style.position = 'fixed';
+            touchClone.style.zIndex = '1000';
+            touchClone.style.opacity = '0.7';
+            touchClone.style.pointerEvents = 'none';
+            touchClone.style.width = this.offsetWidth + 'px';
+            document.body.appendChild(touchClone);
+            
+            updateTouchClonePosition(touch);
+        }
+
+        function handleTouchMove(e) {
+            e.preventDefault();
+            if (touchClone) {
+                updateTouchClonePosition(e.touches[0]);
+            }
+        }
+
+        function updateTouchClonePosition(touch) {
+            if (touchClone) {
+                touchClone.style.left = (touch.clientX - touchClone.offsetWidth / 2) + 'px';
+                touchClone.style.top = (touch.clientY - touchClone.offsetHeight / 2) + 'px';
+            }
+        }
+
+        function handleTouchEnd(e) {
+            if (touchClone) {
+                const touch = e.changedTouches[0];
+                const canvasRect = mainCanvas.getBoundingClientRect();
+                
+                if (touch.clientX >= canvasRect.left && 
+                    touch.clientX <= canvasRect.right &&
+                    touch.clientY >= canvasRect.top && 
+                    touch.clientY <= canvasRect.bottom) {
+                    
+                    const productId = touchElement.dataset.productId;
+                    const product = products.find(p => p.id == productId);
+                    
+                    if (product && !product.soldOut) {
+                        const x = touch.clientX - canvasRect.left - 100;
+                        const y = touch.clientY - canvasRect.top - 100;
+                        
+                        createDroppedItem(product, x, y);
+                        cartItems.set(productId, product);
+                        updateCart();
+                    }
+                }
+                
+                touchClone.remove();
+                touchClone = null;
+                touchElement = null;
+            }
+        }
+
+        mainCanvas.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            mainCanvas.style.borderColor = '#ff3333';
+        });
+
+        mainCanvas.addEventListener('dragleave', () => {
+            mainCanvas.style.borderColor = '#2a2a2a';
+        });
+
+        mainCanvas.addEventListener('drop', (e) => {
+            e.preventDefault();
+            mainCanvas.style.borderColor = '#2a2a2a';
+
+            if (draggedElement) {
+                const productId = draggedElement.dataset.productId;
+                const product = products.find(p => p.id == productId);
+                
+                if (product && !product.soldOut) {
+                    const rect = mainCanvas.getBoundingClientRect();
+                    const x = e.clientX - rect.left - 100;
+                    const y = e.clientY - rect.top - 100;
+                    
+                    createDroppedItem(product, x, y);
+                    cartItems.set(productId, product);
+                    updateCart();
+                }
+            }
+        });
+
+        function createDroppedItem(product, x, y) {
+            const div = document.createElement('div');
+            div.className = 'dropped-item';
+            
+            // Responsive item size based on screen width
+            const isMobile = window.innerWidth <= 768;
+            const itemSize = isMobile ? 120 : 200;
+            
+            div.style.left = Math.max(0, Math.min(x, mainCanvas.offsetWidth - itemSize)) + 'px';
+            div.style.top = Math.max(0, Math.min(y, mainCanvas.offsetHeight - itemSize)) + 'px';
+            div.style.width = itemSize + 'px';
+            div.style.height = itemSize + 'px';
+            div.dataset.productId = product.id;
+            
+            div.innerHTML = `
+                <div class="dropped-item-img">ITEM ${product.id}</div>
+                <button class="remove-btn">×</button>
+            `;
+
+            let isDragging = false;
+            let offsetX, offsetY;
+
+            div.addEventListener('mousedown', (e) => {
+                if (e.target.classList.contains('remove-btn')) {
+                    removeDroppedItem(div, product.id);
+                    return;
+                }
+                isDragging = true;
+                const rect = div.getBoundingClientRect();
+                offsetX = e.clientX - rect.left;
+                offsetY = e.clientY - rect.top;
+                div.style.zIndex = '20';
+                e.stopPropagation();
+            });
+
+            div.addEventListener('touchstart', (e) => {
+                if (e.target.classList.contains('remove-btn')) {
+                    removeDroppedItem(div, product.id);
+                    return;
+                }
+                const touch = e.touches[0];
+                isDragging = true;
+                const rect = div.getBoundingClientRect();
+                offsetX = touch.clientX - rect.left;
+                offsetY = touch.clientY - rect.top;
+                div.style.zIndex = '20';
+                e.stopPropagation();
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (isDragging) {
+                    e.preventDefault();
+                    const canvasRect = mainCanvas.getBoundingClientRect();
+                    let newX = e.clientX - canvasRect.left - offsetX;
+                    let newY = e.clientY - canvasRect.top - offsetY;
+                    
+                    newX = Math.max(0, Math.min(newX, mainCanvas.offsetWidth - div.offsetWidth));
+                    newY = Math.max(0, Math.min(newY, mainCanvas.offsetHeight - div.offsetHeight));
+                    
+                    div.style.left = newX + 'px';
+                    div.style.top = newY + 'px';
+                }
+            });
+
+            document.addEventListener('touchmove', (e) => {
+                if (isDragging) {
+                    e.preventDefault();
+                    const touch = e.touches[0];
+                    const canvasRect = mainCanvas.getBoundingClientRect();
+                    let newX = touch.clientX - canvasRect.left - offsetX;
+                    let newY = touch.clientY - canvasRect.top - offsetY;
+                    
+                    newX = Math.max(0, Math.min(newX, mainCanvas.offsetWidth - div.offsetWidth));
+                    newY = Math.max(0, Math.min(newY, mainCanvas.offsetHeight - div.offsetHeight));
+                    
+                    div.style.left = newX + 'px';
+                    div.style.top = newY + 'px';
+                }
+            });
+
+            document.addEventListener('mouseup', () => {
+                if (isDragging) {
+                    isDragging = false;
+                    div.style.zIndex = '5';
+                }
+            });
+
+            document.addEventListener('touchend', () => {
+                if (isDragging) {
+                    isDragging = false;
+                    div.style.zIndex = '5';
+                }
+            });
+
+            itemsLayer.appendChild(div);
+            droppedItems.push(div);
+            
+            // Add resize handler for this item
+            const constrainItem = () => {
+                const currentLeft = parseInt(div.style.left) || 0;
+                const currentTop = parseInt(div.style.top) || 0;
+                const maxX = mainCanvas.offsetWidth - div.offsetWidth;
+                const maxY = mainCanvas.offsetHeight - div.offsetHeight;
+                
+                const newX = Math.max(0, Math.min(currentLeft, maxX));
+                const newY = Math.max(0, Math.min(currentTop, maxY));
+                
+                div.style.left = newX + 'px';
+                div.style.top = newY + 'px';
+            };
+            
+            window.addEventListener('resize', constrainItem);
+        }
+
+        function removeDroppedItem(element, productId) {
+            element.remove();
+            cartItems.delete(productId.toString());
+            droppedItems = droppedItems.filter(item => item !== element);
+            updateCart();
+        }
+
+        function updateCart() {
+            const count = cartItems.size;
+            const countEl = cartButton.querySelector('.cart-count');
+            countEl.textContent = count;
+            
+            if (count > 0) {
+                cartButton.classList.add('visible');
+            } else {
+                cartButton.classList.remove('visible');
+            }
+        }
+
+        const canvas = document.getElementById('sprayCanvas');
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false;
+        let isPainting = false;
+        let currentColor = '#ff3333';
+        let lastX = null;
+        let lastY = null;
+
+        // Set canvas size to full viewport
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            // Keep dropped items within canvas bounds after resize
+            droppedItems.forEach(item => {
+                const currentLeft = parseInt(item.style.left) || 0;
+                const currentTop = parseInt(item.style.top) || 0;
+                
+                const maxX = mainCanvas.offsetWidth - item.offsetWidth;
+                const maxY = mainCanvas.offsetHeight - item.offsetHeight;
+                
+                item.style.left = Math.max(0, Math.min(currentLeft, maxX)) + 'px';
+                item.style.top = Math.max(0, Math.min(currentTop, maxY)) + 'px';
+            });
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        document.querySelectorAll('.color-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentColor = btn.dataset.color;
+            });
+        });
+
+        // Canvas background selector
+        const canvasBtns = document.querySelectorAll('.canvas-btn');
+        const canvasBackgrounds = {
+            '1': '', // No background / default
+            '2': '', // Add your logo variation URLs here
+            '3': '', // e.g., 'url(logo-variant-1.png)'
+            '4': '',
+            '5': ''
+        };
+
+        canvasBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                canvasBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const canvasId = btn.dataset.canvas;
+                const bgImage = canvasBackgrounds[canvasId];
+                mainCanvas.style.backgroundImage = bgImage;
+            });
+        });
+
+        // Helper to check if element is interactive
+        function isInteractiveElement(element) {
+            if (!element) return false;
+            
+            const tagName = element.tagName?.toLowerCase();
+            const interactiveTags = ['button', 'a', 'input', 'select', 'textarea'];
+            
+            if (interactiveTags.includes(tagName)) return true;
+            if (element.classList?.contains('product-item')) return true;
+            if (element.classList?.contains('dropped-item')) return true;
+            if (element.classList?.contains('color-btn')) return true;
+            if (element.classList?.contains('clear-btn')) return true;
+            if (element.classList?.contains('cart-button')) return true;
+            if (element.classList?.contains('remove-btn')) return true;
+            if (element.closest('nav')) return true;
+            if (element.closest('.product-item')) return true; // Check if inside a product item
+            if (element.closest('.dropped-item')) return true; // Check if inside a dropped item
+            
+            return false;
+        }
+
+        document.addEventListener('mousedown', (e) => {
+            if (!isInteractiveElement(e.target)) {
+                isPainting = true;
+                isDrawing = true;
+                lastX = null;
+                lastY = null;
+                drawSpray(e.clientX, e.clientY);
+                e.preventDefault();
+            }
+        });
+        
+        document.addEventListener('mousemove', (e) => {
+            if (isPainting && isDrawing) {
+                drawSpray(e.clientX, e.clientY);
+            }
+        });
+        
+        document.addEventListener('mouseup', () => {
+            if (isPainting) {
+                isPainting = false;
+                isDrawing = false;
+                lastX = null;
+                lastY = null;
+            }
+        });
+
+        document.addEventListener('touchstart', (e) => {
+            const touch = e.touches[0];
+            const element = document.elementFromPoint(touch.clientX, touch.clientY);
+            
+            if (!isInteractiveElement(element)) {
+                e.preventDefault();
+                isPainting = true;
+                isDrawing = true;
+                lastX = null;
+                lastY = null;
+                drawSpray(touch.clientX, touch.clientY);
+            }
+        }, { passive: false });
+
+        document.addEventListener('touchmove', (e) => {
+            if (isPainting && isDrawing) {
+                e.preventDefault();
+                const touch = e.touches[0];
+                drawSpray(touch.clientX, touch.clientY);
+            }
+        }, { passive: false });
+
+        document.addEventListener('touchend', (e) => {
+            if (isPainting) {
+                isPainting = false;
+                isDrawing = false;
+                lastX = null;
+                lastY = null;
+            }
+        });
+
+        function drawSpray(x, y) {
+            // Create continuous spray paint line with medium density
+            if (lastX !== null && lastY !== null) {
+                const distance = Math.sqrt((x - lastX) ** 2 + (y - lastY) ** 2);
+                const steps = Math.ceil(distance / 1);
+                
+                for (let i = 0; i <= steps; i++) {
+                    const t = i / steps;
+                    const px = lastX + (x - lastX) * t;
+                    const py = lastY + (y - lastY) * t;
+                    
+                    // 8-12 particles per step
+                    const particleCount = Math.floor(Math.random() * 5) + 8;
+                    for (let j = 0; j < particleCount; j++) {
+                        const offsetX = (Math.random() - 0.5) * 15;
+                        const offsetY = (Math.random() - 0.5) * 15;
+                        const size = Math.random() * 2.5 + 1;
+                        
+                        ctx.fillStyle = currentColor;
+                        ctx.globalAlpha = Math.random() * 0.5 + 0.3;
+                        ctx.beginPath();
+                        ctx.arc(px + offsetX, py + offsetY, size, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+            } else {
+                // First point - create initial spray
+                const particleCount = Math.floor(Math.random() * 5) + 12;
+                for (let i = 0; i < particleCount; i++) {
+                    const offsetX = (Math.random() - 0.5) * 15;
+                    const offsetY = (Math.random() - 0.5) * 15;
+                    const size = Math.random() * 2.5 + 1;
+                    
+                    ctx.fillStyle = currentColor;
+                    ctx.globalAlpha = Math.random() * 0.5 + 0.3;
+                    ctx.beginPath();
+                    ctx.arc(x + offsetX, y + offsetY, size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+            ctx.globalAlpha = 1;
+            lastX = x;
+            lastY = y;
+        }
+
+        document.getElementById('clearSpray').addEventListener('click', () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        });
+
+        cartButton.addEventListener('click', () => {
+            alert(`Ready for Shopify checkout!\nItems: ${cartItems.size}`);
+        });
+
+        // Insiders page functionality
+        const insidersPage = document.getElementById('insidersPage');
+        const closeInsiders = document.getElementById('closeInsiders');
+        const emailForm = document.getElementById('emailForm');
+
+        // Open insiders page
+        document.querySelector('a[data-page="insiders"]').addEventListener('click', (e) => {
+            e.preventDefault();
+            insidersPage.classList.add('active');
+        });
+
+        // Close insiders page
+        closeInsiders.addEventListener('click', () => {
+            insidersPage.classList.remove('active');
+        });
+
+        // About page functionality
+        const aboutPage = document.getElementById('aboutPage');
+        const closeAbout = document.getElementById('closeAbout');
+
+        // Open about page
+        document.querySelector('a[data-page="about"]').addEventListener('click', (e) => {
+            e.preventDefault();
+            aboutPage.classList.add('active');
+        });
+
+        // Archive page - go to archive.html
+        document.querySelector('a[data-page="archive"]').addEventListener('click', (e) => {
+            window.location.href = 'archive.html';
+        });
+
+        // Close about page
+        closeAbout.addEventListener('click', () => {
+            aboutPage.classList.remove('active');
+        });
+
+        // Close on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                if (insidersPage.classList.contains('active')) {
+                    insidersPage.classList.remove('active');
+                }
+                if (aboutPage.classList.contains('active')) {
+                    aboutPage.classList.remove('active');
+                }
+            }
+        });
+
+        // Handle form submission
+        emailForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = emailForm.querySelector('input').value;
+            // TODO: Add email to mailing list (Shopify integration)
+            alert(`Thanks for joining! We'll send exclusive updates to ${email}`);
+            emailForm.querySelector('input').value = '';
+            insidersPage.classList.remove('active');
+        });
+    </script>
+</body>
+</html>

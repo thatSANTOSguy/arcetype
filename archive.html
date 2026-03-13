@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARCHIVE - ARCETYPE</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+            color: #e8e8e8;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Arial Black', sans-serif;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 1.5rem 2rem;
+            background: rgba(13, 13, 13, 0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #2a2a2a;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            pointer-events: auto;
+        }
+
+        .brand-name {
+            font-size: 1.5rem;
+            font-weight: 900;
+            letter-spacing: 0.2em;
+            color: #f5f5f5;
+            text-decoration: none;
+            font-family: 'Arial Black', sans-serif;
+        }
+
+        nav {
+            display: flex;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: #e8e8e8;
+            text-decoration: none;
+            font-size: 0.9rem;
+            letter-spacing: 0.1em;
+            transition: color 0.3s;
+            border-bottom: 2px solid transparent;
+            padding-bottom: 0.25rem;
+        }
+
+        nav a:hover {
+            color: #ff3333;
+            border-bottom-color: #ff3333;
+        }
+
+        @media (max-width: 768px) {
+            .brand-name {
+                font-size: 1.1rem;
+            }
+
+            header {
+                padding: 1rem 1rem;
+            }
+
+            nav {
+                gap: 0.75rem;
+            }
+
+            nav a {
+                font-size: 0.65rem;
+            }
+        }
+
+        .archive-container {
+            margin-top: 100px;
+            padding: 3rem 2rem;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .archive-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .archive-title {
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 900;
+            letter-spacing: 0.15em;
+            color: #f5f5f5;
+            margin-bottom: 1rem;
+        }
+
+        .archive-subtitle {
+            font-size: 1rem;
+            color: #888;
+            letter-spacing: 0.1em;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 3rem;
+            margin-bottom: 4rem;
+        }
+
+        .product-card {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            transition: all 0.3s;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .product-card:hover {
+            border-color: #ff3333;
+            box-shadow: 0 0 30px rgba(255, 51, 51, 0.3);
+            transform: translateY(-5px);
+        }
+
+        .product-image {
+            width: 100%;
+            aspect-ratio: 1;
+            background: #0d0d0d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #555;
+            font-size: 1rem;
+            letter-spacing: 0.1em;
+            position: relative;
+        }
+
+        .sold-out-overlay {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255, 51, 51, 0.9);
+            color: #fff;
+            padding: 0.5rem 1rem;
+            font-size: 0.7rem;
+            letter-spacing: 0.1em;
+            font-weight: bold;
+        }
+
+        .product-info {
+            padding: 1.5rem;
+        }
+
+        .product-name {
+            font-size: 1rem;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.5rem;
+            color: #f5f5f5;
+        }
+
+        .product-price {
+            font-size: 1.2rem;
+            color: #ff3333;
+            letter-spacing: 0.05em;
+            font-weight: 700;
+        }
+
+        @media (max-width: 768px) {
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 1.5rem;
+            }
+
+            .archive-container {
+                padding: 2rem 1rem;
+                margin-top: 80px;
+            }
+
+            .product-info {
+                padding: 1rem;
+            }
+
+            .product-name {
+                font-size: 0.85rem;
+            }
+
+            .product-price {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="index.html" class="brand-name">ARCETYPE</a>
+        <nav>
+            <a href="index.html">CANVAS</a>
+            <a href="archive.html">ARCHIVE</a>
+            <a href="index.html#about">ABOUT</a>
+            <a href="index.html#insiders">INSIDERS</a>
+        </nav>
+    </header>
+
+    <div class="archive-container">
+        <div class="archive-header">
+            <h1 class="archive-title">ARCHIVE</h1>
+            <p class="archive-subtitle">Every piece. Every drop. Past and present.</p>
+        </div>
+
+        <div class="products-grid">
+            <!-- Active Products -->
+            <a href="product.html?id=1" class="product-card">
+                <div class="product-image">PRODUCT IMAGE</div>
+                <div class="product-info">
+                    <div class="product-name">VINTAGE TEE 001</div>
+                    <div class="product-price">$45</div>
+                </div>
+            </a>
+
+            <a href="product.html?id=2" class="product-card">
+                <div class="product-image">PRODUCT IMAGE</div>
+                <div class="product-info">
+                    <div class="product-name">CARGO PANTS 002</div>
+                    <div class="product-price">$85</div>
+                </div>
+            </a>
+
+            <a href="product.html?id=3" class="product-card">
+                <div class="product-image">PRODUCT IMAGE</div>
+                <div class="product-info">
+                    <div class="product-name">HOODIE 003</div>
+                    <div class="product-price">$95</div>
+                </div>
+            </a>
+
+            <!-- Sold Out Product -->
+            <a href="product.html?id=4" class="product-card">
+                <div class="product-image">
+                    <span>PRODUCT IMAGE</span>
+                    <div class="sold-out-overlay">SOLD OUT</div>
+                </div>
+                <div class="product-info">
+                    <div class="product-name">JACKET 004</div>
+                    <div class="product-price">$125</div>
+                </div>
+            </a>
+
+            <a href="product.html?id=5" class="product-card">
+                <div class="product-image">PRODUCT IMAGE</div>
+                <div class="product-info">
+                    <div class="product-name">SHORTS 005</div>
+                    <div class="product-price">$55</div>
+                </div>
+            </a>
+
+            <a href="product.html?id=6" class="product-card">
+                <div class="product-image">PRODUCT IMAGE</div>
+                <div class="product-info">
+                    <div class="product-name">SWEATPANTS 006</div>
+                    <div class="product-price">$75</div>
+                </div>
+            </a>
+
+            <a href="product.html?id=7" class="product-card">
+                <div class="product-image">PRODUCT IMAGE</div>
+                <div class="product-info">
+                    <div class="product-name">CAP 007</div>
+                    <div class="product-price">$35</div>
+                </div>
+            </a>
+        </div>
+    </div>
+</body>
+</html>
