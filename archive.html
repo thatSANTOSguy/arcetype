@@ -860,9 +860,9 @@
             const bgLayer = document.getElementById('canvasBackgroundLayer');
             const sprayOverlay = document.getElementById('sprayPaintOverlay');
             
-            if (savedBg && savedBg !== 'bg1.jpg') {
-                // Only override if there's a custom background (not default bg1)
-                bgLayer.style.backgroundImage = `linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%), url('${savedBg}')`;
+            if (savedBg) {
+                // Apply background with light overlay
+                bgLayer.style.backgroundImage = `linear-gradient(135deg, rgba(26, 26, 26, 0.3) 0%, rgba(13, 13, 13, 0.3) 100%), url('${savedBg}')`;
             }
             
             if (savedSpray) {
