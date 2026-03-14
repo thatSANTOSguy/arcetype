@@ -204,6 +204,277 @@
                 font-size: 1rem;
             }
         }
+
+        /* Insiders Page */
+        .insiders-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #0d0d0d;
+            z-index: 200;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .insiders-page.active {
+            display: flex;
+        }
+
+        .insiders-content {
+            max-width: 600px;
+            text-align: center;
+        }
+
+        .insiders-headline {
+            font-size: clamp(2rem, 6vw, 4rem);
+            font-weight: 900;
+            letter-spacing: 0.15em;
+            color: #f5f5f5;
+            margin-bottom: 1rem;
+            font-family: 'Arial Black', sans-serif;
+        }
+
+        .insiders-subtext {
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            color: #888;
+            letter-spacing: 0.1em;
+            margin-bottom: 3rem;
+            line-height: 1.6;
+        }
+
+        .email-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            align-items: center;
+        }
+
+        .email-input {
+            background: transparent;
+            border: 2px solid #3a3a3a;
+            color: #f5f5f5;
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+            letter-spacing: 0.05em;
+            font-family: 'Courier New', monospace;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        .email-input:focus {
+            outline: none;
+            border-color: #ff3333;
+            box-shadow: 0 0 20px rgba(255, 51, 51, 0.3);
+        }
+
+        .email-input::placeholder {
+            color: #555;
+            letter-spacing: 0.1em;
+        }
+
+        .submit-btn {
+            background: #ff3333;
+            color: #fff;
+            border: none;
+            padding: 0.75rem 2rem;
+            font-size: 0.9rem;
+            letter-spacing: 0.2em;
+            font-weight: 900;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Arial Black', sans-serif;
+            text-transform: uppercase;
+            border-radius: 50px;
+        }
+
+        .submit-btn:hover {
+            background: #ff0000;
+            box-shadow: 0 10px 40px rgba(255, 51, 51, 0.6);
+        }
+
+        .close-insiders {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            background: transparent;
+            border: none;
+            color: #888;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-insiders:hover {
+            color: #fff;
+            transform: rotate(90deg);
+        }
+
+        /* About Page */
+        .about-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #0d0d0d;
+            z-index: 200;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .about-page.active {
+            display: flex;
+        }
+
+        .about-content {
+            max-width: 900px;
+            text-align: left;
+            padding: 2rem 0;
+        }
+
+        .about-pronunciation {
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            font-style: italic;
+            color: #888;
+            margin-bottom: 2rem;
+            letter-spacing: 0.05em;
+        }
+
+        .about-text {
+            font-size: clamp(0.85rem, 2vw, 1rem);
+            color: #e8e8e8;
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+            letter-spacing: 0.02em;
+        }
+
+        .about-text.highlight {
+            font-style: italic;
+            font-weight: 600;
+            margin-top: 2rem;
+        }
+
+        .close-about {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            background: transparent;
+            border: none;
+            color: #888;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-about:hover {
+            color: #fff;
+            transform: rotate(90deg);
+        }
+
+        /* Footer */
+        footer {
+            background: #0d0d0d;
+            border-top: 1px solid #2a2a2a;
+            padding: 3rem 2rem;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .social-link {
+            color: #888;
+            text-decoration: none;
+            font-size: 0.9rem;
+            letter-spacing: 0.1em;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .social-link:hover {
+            color: #ff3333;
+        }
+
+        .shop-button {
+            background: #5B4FFF;
+            border: none;
+            color: #fff;
+            padding: 0.65rem 1.5rem;
+            font-size: 1rem;
+            letter-spacing: 0.02em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            text-transform: none;
+            border-radius: 50px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .shop-button:hover {
+            background: #4840CC;
+            box-shadow: 0 4px 20px rgba(91, 79, 255, 0.4);
+        }
+
+        .shop-button::before {
+            content: '♡';
+            font-size: 1.4rem;
+            line-height: 1;
+        }
+
+        .footer-brand {
+            font-size: 0.8rem;
+            color: #555;
+            letter-spacing: 0.2em;
+            font-family: 'Arial Black', sans-serif;
+        }
+
+        @media (max-width: 768px) {
+            footer {
+                padding: 2rem 1rem;
+            }
+
+            .social-links {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -212,8 +483,8 @@
         <nav>
             <a href="index.html">CANVAS</a>
             <a href="archive.html">ARCHIVE</a>
-            <a href="index.html#about">ABOUT</a>
-            <a href="index.html#insiders">INSIDERS</a>
+            <a href="index.html" data-popup="about">ABOUT</a>
+            <a href="index.html" data-popup="insiders">INSIDERS</a>
         </nav>
     </header>
 
@@ -286,5 +557,113 @@
             </a>
         </div>
     </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="social-links">
+                <a href="#" class="social-link" target="_blank" rel="noopener noreferrer">
+                    <span>INSTAGRAM</span>
+                </a>
+                <a href="#" class="social-link" target="_blank" rel="noopener noreferrer">
+                    <span>TIKTOK</span>
+                </a>
+                <a href="#" class="shop-button" target="_blank" rel="noopener noreferrer">
+                    Follow on Shop
+                </a>
+            </div>
+            <div class="footer-brand">ARCETYPE</div>
+        </div>
+    </footer>
+
+    <!-- Insiders Page -->
+    <div class="insiders-page" id="insidersPage">
+        <button class="close-insiders" id="closeInsiders">×</button>
+        <div class="insiders-content">
+            <h1 class="insiders-headline">FOR THE INSIDERS...</h1>
+            <p class="insiders-subtext">
+                Early access. Exclusive drops. Behind the scenes.<br>
+                Join the inner circle.
+            </p>
+            <form class="email-form" id="emailForm">
+                <input 
+                    type="email" 
+                    class="email-input" 
+                    placeholder="YOUR EMAIL" 
+                    required
+                >
+                <button type="submit" class="submit-btn">Join Now</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- About Page -->
+    <div class="about-page" id="aboutPage">
+        <button class="close-about" id="closeAbout">×</button>
+        <div class="about-content">
+            <p class="about-pronunciation">archetype/ˈɑːkɪtʌɪp/</p>
+            
+            <p class="about-text">
+                Arcetype is about embracing the different gifts we were blessed with that help us understand who we are. For everyone there's a style to their story.
+            </p>
+
+            <p class="about-text">
+                Archetypes are like the built-in patterns in our brain which help us understand the world and act a certain way. Even before we know who we are or learn anything, we all have these deep inner feelings and behaviours that we're born with. They're kind of like instincts — they help guide us before we even think about it.
+            </p>
+
+            <p class="about-text highlight">
+                We're more than a brand — we're a movement. A community redefining what it means to evolve without losing yourself. Delivering the newest, boldest ways to elevate your lifestyle while staying true to your core
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Insiders page functionality
+        const insidersPage = document.getElementById('insidersPage');
+        const closeInsiders = document.getElementById('closeInsiders');
+        const emailForm = document.getElementById('emailForm');
+
+        document.querySelector('a[data-popup="insiders"]').addEventListener('click', (e) => {
+            e.preventDefault();
+            insidersPage.classList.add('active');
+        });
+
+        closeInsiders.addEventListener('click', () => {
+            insidersPage.classList.remove('active');
+        });
+
+        // About page functionality
+        const aboutPage = document.getElementById('aboutPage');
+        const closeAbout = document.getElementById('closeAbout');
+
+        document.querySelector('a[data-popup="about"]').addEventListener('click', (e) => {
+            e.preventDefault();
+            aboutPage.classList.add('active');
+        });
+
+        closeAbout.addEventListener('click', () => {
+            aboutPage.classList.remove('active');
+        });
+
+        // Close on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                if (insidersPage.classList.contains('active')) {
+                    insidersPage.classList.remove('active');
+                }
+                if (aboutPage.classList.contains('active')) {
+                    aboutPage.classList.remove('active');
+                }
+            }
+        });
+
+        // Handle form submission
+        emailForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = emailForm.querySelector('input').value;
+            alert(`Thanks for joining! We'll send exclusive updates to ${email}`);
+            emailForm.querySelector('input').value = '';
+            insidersPage.classList.remove('active');
+        });
+    </script>
 </body>
 </html>
