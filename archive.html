@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ARCHIVE - ARCETYPE</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -12,17 +15,56 @@
         }
 
         body {
-            font-family: 'Courier New', monospace;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
             color: #e8e8e8;
             overflow-x: hidden;
             min-height: 100vh;
+            position: relative;
+        }
+
+        /* Canvas Background Layer */
+        .canvas-background-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+            background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .spray-paint-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 1;
         }
 
         h1, h2, h3 {
-            font-family: 'Arial Black', sans-serif;
-            letter-spacing: 0.15em;
+            font-family: 'Space Grotesk', sans-serif;
+            letter-spacing: 0.08em;
             text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+        }
+
+        h2 {
+            font-size: 1.3rem;
+        }
+
+        h3 {
+            font-size: 1rem;
         }
 
         header {
@@ -42,12 +84,12 @@
         }
 
         .brand-name {
-            font-size: 1.5rem;
-            font-weight: 900;
-            letter-spacing: 0.2em;
+            font-size: 1.1rem;
+            font-weight: 500;
+            letter-spacing: 0.15em;
             color: #f5f5f5;
             text-decoration: none;
-            font-family: 'Arial Black', sans-serif;
+            font-family: 'JetBrains Mono', monospace;
         }
 
         nav {
@@ -58,11 +100,13 @@
         nav a {
             color: #e8e8e8;
             text-decoration: none;
-            font-size: 0.9rem;
-            letter-spacing: 0.1em;
+            font-size: 0.75rem;
+            letter-spacing: 0.12em;
             transition: color 0.3s;
             border-bottom: 2px solid transparent;
             padding-bottom: 0.25rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 400;
         }
 
         nav a:hover {
@@ -102,17 +146,132 @@
         }
 
         .archive-title {
-            font-size: clamp(2.5rem, 6vw, 4rem);
-            font-weight: 900;
-            letter-spacing: 0.15em;
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            font-weight: 600;
+            letter-spacing: 0.1em;
             color: #f5f5f5;
             margin-bottom: 1rem;
+            font-family: 'JetBrains Mono', monospace;
         }
 
         .archive-subtitle {
-            font-size: 1rem;
+            font-size: 0.9rem;
             color: #888;
+            letter-spacing: 0.05em;
+            font-family: 'Inter', sans-serif;
+            font-style: italic;
+            font-weight: 400;
+        }
+
+        .archive-filters {
+            margin-top: 3rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .layout-switcher {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .layout-btn {
+            background: transparent;
+            border: 2px solid #3a3a3a;
+            color: #888;
+            padding: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .layout-btn:hover {
+            border-color: #ff3333;
+            color: #ff3333;
+        }
+
+        .layout-btn.active {
+            background: #ff3333;
+            border-color: #ff3333;
+            color: #fff;
+        }
+
+        .layout-btn svg {
+            width: 18px;
+            height: 18px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+        }
+
+        .search-input {
+            background: transparent;
+            border: 2px solid #3a3a3a;
+            color: #e8e8e8;
+            padding: 0.75rem 1.5rem;
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            width: 100%;
+            max-width: 400px;
+            transition: all 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #ff3333;
+            box-shadow: 0 0 20px rgba(255, 51, 51, 0.3);
+        }
+
+        .search-input::placeholder {
+            color: #555;
             letter-spacing: 0.1em;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .filter-btn {
+            background: transparent;
+            border: 2px solid #3a3a3a;
+            color: #888;
+            padding: 0.5rem 1.25rem;
+            font-size: 0.8rem;
+            letter-spacing: 0.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            text-transform: uppercase;
+        }
+
+        .filter-btn:hover {
+            border-color: #ff3333;
+            color: #ff3333;
+        }
+
+        .filter-btn.active {
+            background: #ff3333;
+            border-color: #ff3333;
+            color: #fff;
         }
 
         .products-grid {
@@ -120,6 +279,51 @@
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 3rem;
             margin-bottom: 4rem;
+        }
+
+        .products-grid.layout-2col {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .products-grid.layout-3col {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .products-grid.layout-3col .product-card,
+        .products-grid.layout-2col .product-card {
+            min-width: 0;
+        }
+
+        .products-grid.layout-list {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .products-grid.layout-list .product-card {
+            flex-direction: row;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .products-grid.layout-list .product-image {
+            width: 120px;
+            height: 120px;
+            flex-shrink: 0;
+        }
+
+        .products-grid.layout-list .product-info {
+            flex: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .products-grid.layout-list .product-name {
+            font-size: 1rem;
+        }
+
+        .products-grid.layout-list .product-price {
+            font-size: 1.1rem;
         }
 
         .product-card {
@@ -168,23 +372,31 @@
         }
 
         .product-name {
-            font-size: 1rem;
-            letter-spacing: 0.1em;
+            font-size: 0.85rem;
+            letter-spacing: 0.05em;
             margin-bottom: 0.5rem;
             color: #f5f5f5;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 500;
         }
 
         .product-price {
-            font-size: 1.2rem;
+            font-size: 0.9rem;
             color: #ff3333;
             letter-spacing: 0.05em;
-            font-weight: 700;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
         }
 
         @media (max-width: 768px) {
             .products-grid {
                 grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
                 gap: 1.5rem;
+            }
+
+            .products-grid.layout-2col,
+            .products-grid.layout-3col {
+                grid-template-columns: repeat(2, 1fr);
             }
 
             .archive-container {
@@ -231,20 +443,23 @@
         }
 
         .insiders-headline {
-            font-size: clamp(2rem, 6vw, 4rem);
-            font-weight: 900;
-            letter-spacing: 0.15em;
+            font-size: clamp(1.5rem, 4vw, 2.2rem);
+            font-weight: 600;
+            letter-spacing: 0.1em;
             color: #f5f5f5;
             margin-bottom: 1rem;
-            font-family: 'Arial Black', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
         }
 
         .insiders-subtext {
-            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            font-size: clamp(0.85rem, 1.8vw, 1rem);
             color: #888;
-            letter-spacing: 0.1em;
+            letter-spacing: 0.03em;
             margin-bottom: 3rem;
             line-height: 1.6;
+            font-family: 'Inter', sans-serif;
+            font-style: italic;
+            font-weight: 400;
         }
 
         .email-form {
@@ -262,7 +477,7 @@
             padding: 1rem 1.5rem;
             font-size: 1rem;
             letter-spacing: 0.05em;
-            font-family: 'Courier New', monospace;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             transition: all 0.3s;
             width: 100%;
         }
@@ -288,7 +503,7 @@
             font-weight: 900;
             cursor: pointer;
             transition: all 0.3s;
-            font-family: 'Arial Black', sans-serif;
+            font-family: 'JetBrains Mono', monospace;
             text-transform: uppercase;
             border-radius: 50px;
         }
@@ -348,7 +563,7 @@
 
         .about-pronunciation {
             font-size: clamp(0.9rem, 2vw, 1.1rem);
-            font-style: italic;
+            
             color: #888;
             margin-bottom: 2rem;
             letter-spacing: 0.05em;
@@ -363,7 +578,7 @@
         }
 
         .about-text.highlight {
-            font-style: italic;
+            
             font-weight: 600;
             margin-top: 2rem;
         }
@@ -388,6 +603,52 @@
         .close-about:hover {
             color: #fff;
             transform: rotate(90deg);
+        }
+
+        /* Cart Button */
+        .cart-button {
+            position: fixed;
+            bottom: 3rem;
+            right: 3rem;
+            background: #ff3333;
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            padding: 0.75rem 2rem;
+            font-size: 0.9rem;
+            letter-spacing: 0.2em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 10px 40px rgba(255, 51, 51, 0.4);
+            opacity: 0;
+            visibility: hidden;
+            z-index: 50;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .cart-button.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .cart-button:hover {
+            background: #ff0000;
+            transform: translateY(-2px);
+            box-shadow: 0 15px 50px rgba(255, 51, 51, 0.6);
+        }
+
+        .cart-count {
+            background: #fff;
+            color: #ff3333;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 0.5rem;
+            font-size: 0.8rem;
         }
 
         /* Footer */
@@ -462,7 +723,7 @@
             font-size: 0.8rem;
             color: #555;
             letter-spacing: 0.2em;
-            font-family: 'Arial Black', sans-serif;
+            font-family: 'JetBrains Mono', monospace;
         }
 
         @media (max-width: 768px) {
@@ -478,6 +739,11 @@
     </style>
 </head>
 <body>
+    <!-- Canvas Background Layer -->
+    <div class="canvas-background-layer" id="canvasBackgroundLayer">
+        <img class="spray-paint-overlay" id="sprayPaintOverlay" style="display: none;">
+    </div>
+
     <header>
         <a href="index.html" class="brand-name">ARCETYPE</a>
         <nav>
@@ -492,71 +758,197 @@
         <div class="archive-header">
             <h1 class="archive-title">ARCHIVE</h1>
             <p class="archive-subtitle">Every piece. Every drop. Past and present.</p>
+            
+            <div class="archive-filters">
+                <input type="text" class="search-input" id="searchInput" placeholder="Search products...">
+                
+                <div class="filter-row">
+                    <div class="filter-buttons">
+                        <button class="filter-btn active" data-filter="all">All</button>
+                        <button class="filter-btn" data-filter="tops">Tops</button>
+                        <button class="filter-btn" data-filter="bottoms">Bottoms</button>
+                        <button class="filter-btn" data-filter="accessories">Accessories</button>
+                        <button class="filter-btn" data-filter="available">Available</button>
+                        <button class="filter-btn" data-filter="sold-out">Sold Out</button>
+                    </div>
+
+                    <div class="layout-switcher">
+                        <button class="layout-btn" data-layout="2col" title="2 columns">
+                            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="18"/><rect x="13" y="3" width="8" height="18"/></svg>
+                        </button>
+                        <button class="layout-btn active" data-layout="3col" title="3 columns">
+                            <svg viewBox="0 0 24 24"><rect x="2" y="3" width="5" height="18"/><rect x="9" y="3" width="5" height="18"/><rect x="16" y="3" width="5" height="18"/></svg>
+                        </button>
+                        <button class="layout-btn" data-layout="list" title="List view">
+                            <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div class="products-grid">
-            <!-- Active Products -->
-            <a href="product.html?id=1" class="product-card">
-                <div class="product-image">PRODUCT IMAGE</div>
-                <div class="product-info">
-                    <div class="product-name">VINTAGE TEE 001</div>
-                    <div class="product-price">$45</div>
-                </div>
-            </a>
-
-            <a href="product.html?id=2" class="product-card">
-                <div class="product-image">PRODUCT IMAGE</div>
-                <div class="product-info">
-                    <div class="product-name">CARGO PANTS 002</div>
-                    <div class="product-price">$85</div>
-                </div>
-            </a>
-
-            <a href="product.html?id=3" class="product-card">
-                <div class="product-image">PRODUCT IMAGE</div>
-                <div class="product-info">
-                    <div class="product-name">HOODIE 003</div>
-                    <div class="product-price">$95</div>
-                </div>
-            </a>
-
-            <!-- Sold Out Product -->
-            <a href="product.html?id=4" class="product-card">
-                <div class="product-image">
-                    <span>PRODUCT IMAGE</span>
-                    <div class="sold-out-overlay">SOLD OUT</div>
-                </div>
-                <div class="product-info">
-                    <div class="product-name">JACKET 004</div>
-                    <div class="product-price">$125</div>
-                </div>
-            </a>
-
-            <a href="product.html?id=5" class="product-card">
-                <div class="product-image">PRODUCT IMAGE</div>
-                <div class="product-info">
-                    <div class="product-name">SHORTS 005</div>
-                    <div class="product-price">$55</div>
-                </div>
-            </a>
-
-            <a href="product.html?id=6" class="product-card">
-                <div class="product-image">PRODUCT IMAGE</div>
-                <div class="product-info">
-                    <div class="product-name">SWEATPANTS 006</div>
-                    <div class="product-price">$75</div>
-                </div>
-            </a>
-
-            <a href="product.html?id=7" class="product-card">
-                <div class="product-image">PRODUCT IMAGE</div>
-                <div class="product-info">
-                    <div class="product-name">CAP 007</div>
-                    <div class="product-price">$35</div>
-                </div>
-            </a>
+        <div class="products-grid" id="productsGrid">
+            <!-- Products will be loaded dynamically -->
         </div>
     </div>
+
+    <!-- Cart Button -->
+    <button class="cart-button" id="cartButton">
+        GO TO CART<span class="cart-count">0</span>
+    </button>
+
+    <script>
+        // Products data
+        const products = [
+            { id: 1, name: 'WASHED ONYX 001', price: '£65.99', soldOut: false, category: 'tops' },
+            { id: 2, name: 'EARTH N VEIL 001', price: '£65.99', soldOut: false, category: 'tops' },
+            { id: 3, name: 'WASHED ONYX 001 (BOTTOMS)', price: '£53.99', soldOut: false, category: 'bottoms' },
+            { id: 4, name: 'EARTH N VEIL 001 (BOTTOMS)', price: '£53.99', soldOut: false, category: 'bottoms' },
+            { id: 5, name: 'MARBLE TIDE (skull cap)', price: '£19.99', soldOut: true, category: 'accessories' },
+            { id: 6, name: 'MIND GAMES (skull cap)', price: '£19.99', soldOut: true, category: 'accessories' },
+            { id: 7, name: 'ELYSIAN PASTURE (skull cap)', price: '£19.99', soldOut: true, category: 'accessories' },
+            { id: 8, name: 'FERAL REIGN (skull cap)', price: '£19.99', soldOut: true, category: 'accessories' }
+        ];
+
+        const productsGrid = document.getElementById('productsGrid');
+        const searchInput = document.getElementById('searchInput');
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const layoutButtons = document.querySelectorAll('.layout-btn');
+        const cartButton = document.getElementById('cartButton');
+
+        let currentFilter = 'all';
+        let currentSearch = '';
+        let currentLayout = '3col';
+
+        // localStorage cart persistence
+        let cartItems = new Map();
+
+        function saveCart() {
+            const cartArray = Array.from(cartItems.entries());
+            localStorage.setItem('arcetypeCart', JSON.stringify(cartArray));
+        }
+
+        function loadCart() {
+            const saved = localStorage.getItem('arcetypeCart');
+            if (saved) {
+                const cartArray = JSON.parse(saved);
+                cartItems = new Map(cartArray);
+                updateCart();
+            }
+        }
+
+        function updateCart() {
+            const count = cartItems.size;
+            const countEl = cartButton.querySelector('.cart-count');
+            countEl.textContent = count;
+            
+            if (count > 0) {
+                cartButton.classList.add('visible');
+            } else {
+                cartButton.classList.remove('visible');
+            }
+        }
+
+        // Load cart on page load
+        loadCart();
+
+        // Load canvas background and spray paint
+        function loadCanvasBackground() {
+            const savedBg = localStorage.getItem('canvasBackground');
+            const savedSpray = localStorage.getItem('sprayPaint');
+            
+            const bgLayer = document.getElementById('canvasBackgroundLayer');
+            const sprayOverlay = document.getElementById('sprayPaintOverlay');
+            
+            if (savedBg && savedBg !== 'bg1.jpg') {
+                // Only override if there's a custom background (not default bg1)
+                bgLayer.style.backgroundImage = `linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%), url('${savedBg}')`;
+            }
+            
+            if (savedSpray) {
+                sprayOverlay.src = savedSpray;
+                sprayOverlay.style.display = 'block';
+            }
+        }
+
+        loadCanvasBackground();
+
+        // Cart button click
+        cartButton.addEventListener('click', () => {
+            // TODO: Navigate to Shopify checkout or cart page
+            alert(`Cart has ${cartItems.size} item(s). Shopify checkout coming soon!`);
+        });
+
+        // Layout switcher
+        layoutButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                layoutButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentLayout = btn.dataset.layout;
+                
+                // Remove all layout classes
+                productsGrid.classList.remove('layout-2col', 'layout-3col', 'layout-list');
+                // Add current layout class
+                if (currentLayout !== '3col') {
+                    productsGrid.classList.add(`layout-${currentLayout}`);
+                }
+            });
+        });
+
+        // Render products
+        function renderProducts() {
+            const filtered = products.filter(product => {
+                // Filter by category/status
+                const matchesFilter = 
+                    currentFilter === 'all' ||
+                    currentFilter === product.category ||
+                    (currentFilter === 'available' && !product.soldOut) ||
+                    (currentFilter === 'sold-out' && product.soldOut);
+
+                // Filter by search
+                const matchesSearch = product.name.toLowerCase().includes(currentSearch.toLowerCase());
+
+                return matchesFilter && matchesSearch;
+            });
+
+            productsGrid.innerHTML = filtered.map(product => `
+                <a href="product.html?id=${product.id}" class="product-card" data-category="${product.category}" data-sold-out="${product.soldOut}">
+                    <div class="product-image">
+                        ${product.soldOut ? '<div class="sold-out-overlay">SOLD OUT</div>' : ''}
+                        PRODUCT IMAGE
+                    </div>
+                    <div class="product-info">
+                        <div class="product-name">${product.name}</div>
+                        <div class="product-price">${product.price}</div>
+                    </div>
+                </a>
+            `).join('');
+
+            // Show message if no results
+            if (filtered.length === 0) {
+                productsGrid.innerHTML = '<p style="color: #888; text-align: center; grid-column: 1/-1; padding: 4rem;">No products found.</p>';
+            }
+        }
+
+        // Filter buttons
+        filterButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilter = btn.dataset.filter;
+                renderProducts();
+            });
+        });
+
+        // Search input
+        searchInput.addEventListener('input', (e) => {
+            currentSearch = e.target.value;
+            renderProducts();
+        });
+
+        // Initial render
+        renderProducts();
+    </script>
 
     <footer>
         <div class="footer-content">
@@ -571,7 +963,7 @@
                     Follow on Shop
                 </a>
             </div>
-            <div class="footer-brand">ARCETYPE</div>
+            <div class="footer-brand">© 2026, arcetype</div>
         </div>
     </footer>
 
@@ -622,7 +1014,7 @@
         const closeInsiders = document.getElementById('closeInsiders');
         const emailForm = document.getElementById('emailForm');
 
-        document.querySelector('a[data-popup="insiders"]').addEventListener('click', (e) => {
+        document.querySelector('a[data-popup="insiders"]')?.addEventListener('click', (e) => {
             e.preventDefault();
             insidersPage.classList.add('active');
         });
@@ -635,7 +1027,7 @@
         const aboutPage = document.getElementById('aboutPage');
         const closeAbout = document.getElementById('closeAbout');
 
-        document.querySelector('a[data-popup="about"]').addEventListener('click', (e) => {
+        document.querySelector('a[data-popup="about"]')?.addEventListener('click', (e) => {
             e.preventDefault();
             aboutPage.classList.add('active');
         });

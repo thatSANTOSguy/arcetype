@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PRODUCT - ARCETYPE</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -12,17 +15,56 @@
         }
 
         body {
-            font-family: 'Courier New', monospace;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
             color: #e8e8e8;
             overflow-x: hidden;
             min-height: 100vh;
+            position: relative;
+        }
+
+        /* Canvas Background Layer */
+        .canvas-background-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+            background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .spray-paint-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 1;
         }
 
         h1, h2, h3 {
-            font-family: 'Arial Black', sans-serif;
-            letter-spacing: 0.15em;
+            font-family: 'Space Grotesk', sans-serif;
+            letter-spacing: 0.08em;
             text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+        }
+
+        h2 {
+            font-size: 1.3rem;
+        }
+
+        h3 {
+            font-size: 1rem;
         }
 
         header {
@@ -42,12 +84,12 @@
         }
 
         .brand-name {
-            font-size: 1.5rem;
-            font-weight: 900;
-            letter-spacing: 0.2em;
+            font-size: 1.1rem;
+            font-weight: 500;
+            letter-spacing: 0.15em;
             color: #f5f5f5;
             text-decoration: none;
-            font-family: 'Arial Black', sans-serif;
+            font-family: 'JetBrains Mono', monospace;
         }
 
         nav {
@@ -58,11 +100,13 @@
         nav a {
             color: #e8e8e8;
             text-decoration: none;
-            font-size: 0.9rem;
-            letter-spacing: 0.1em;
+            font-size: 0.75rem;
+            letter-spacing: 0.12em;
             transition: color 0.3s;
             border-bottom: 2px solid transparent;
             padding-bottom: 0.25rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 400;
         }
 
         nav a:hover {
@@ -143,24 +187,40 @@
         }
 
         .product-title {
-            font-size: clamp(2rem, 4vw, 3rem);
-            font-weight: 900;
-            letter-spacing: 0.15em;
+            font-size: clamp(1.3rem, 3vw, 1.8rem);
+            font-weight: 600;
+            letter-spacing: 0.08em;
             color: #f5f5f5;
+            font-family: 'JetBrains Mono', monospace;
         }
 
         .product-price {
-            font-size: 2rem;
+            font-size: 1.3rem;
             color: #ff3333;
             letter-spacing: 0.05em;
-            font-weight: 700;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .sold-out-tag {
+            display: inline-block;
+            background: #ff3333;
+            color: #0d0d0d;
+            padding: 0.4rem 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.15em;
+            margin-top: 0.5rem;
+            font-family: 'JetBrains Mono', monospace;
         }
 
         .product-description {
-            font-size: 1rem;
+            font-size: 0.95rem;
             line-height: 1.8;
             color: #888;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.02em;
+            font-family: 'Inter', sans-serif;
+            font-weight: 400;
         }
 
         .size-selector {
@@ -190,7 +250,7 @@
             letter-spacing: 0.1em;
             cursor: pointer;
             transition: all 0.3s;
-            font-family: 'Courier New', monospace;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         }
 
         .size-option:hover {
@@ -214,7 +274,7 @@
             font-weight: 900;
             cursor: pointer;
             transition: all 0.3s;
-            font-family: 'Arial Black', sans-serif;
+            font-family: 'JetBrains Mono', monospace;
             text-transform: uppercase;
             margin-top: 2rem;
         }
@@ -280,20 +340,23 @@
         }
 
         .insiders-headline {
-            font-size: clamp(2rem, 6vw, 4rem);
-            font-weight: 900;
-            letter-spacing: 0.15em;
+            font-size: clamp(1.5rem, 4vw, 2.2rem);
+            font-weight: 600;
+            letter-spacing: 0.1em;
             color: #f5f5f5;
             margin-bottom: 1rem;
-            font-family: 'Arial Black', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
         }
 
         .insiders-subtext {
-            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            font-size: clamp(0.85rem, 1.8vw, 1rem);
             color: #888;
-            letter-spacing: 0.1em;
+            letter-spacing: 0.03em;
             margin-bottom: 3rem;
             line-height: 1.6;
+            font-family: 'Inter', sans-serif;
+            font-style: italic;
+            font-weight: 400;
         }
 
         .email-form {
@@ -311,7 +374,7 @@
             padding: 1rem 1.5rem;
             font-size: 1rem;
             letter-spacing: 0.05em;
-            font-family: 'Courier New', monospace;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             transition: all 0.3s;
             width: 100%;
         }
@@ -337,7 +400,7 @@
             font-weight: 900;
             cursor: pointer;
             transition: all 0.3s;
-            font-family: 'Arial Black', sans-serif;
+            font-family: 'JetBrains Mono', monospace;
             text-transform: uppercase;
             border-radius: 50px;
         }
@@ -439,6 +502,52 @@
             transform: rotate(90deg);
         }
 
+        /* Cart Button */
+        .cart-button {
+            position: fixed;
+            bottom: 3rem;
+            right: 3rem;
+            background: #ff3333;
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            padding: 0.75rem 2rem;
+            font-size: 0.9rem;
+            letter-spacing: 0.2em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 10px 40px rgba(255, 51, 51, 0.4);
+            opacity: 0;
+            visibility: hidden;
+            z-index: 50;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .cart-button.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .cart-button:hover {
+            background: #ff0000;
+            transform: translateY(-2px);
+            box-shadow: 0 15px 50px rgba(255, 51, 51, 0.6);
+        }
+
+        .cart-count {
+            background: #fff;
+            color: #ff3333;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 0.5rem;
+            font-size: 0.8rem;
+        }
+
         /* Footer */
         footer {
             background: #0d0d0d;
@@ -511,7 +620,7 @@
             font-size: 0.8rem;
             color: #555;
             letter-spacing: 0.2em;
-            font-family: 'Arial Black', sans-serif;
+            font-family: 'JetBrains Mono', monospace;
         }
 
         @media (max-width: 768px) {
@@ -527,6 +636,11 @@
     </style>
 </head>
 <body>
+    <!-- Canvas Background Layer -->
+    <div class="canvas-background-layer" id="canvasBackgroundLayer">
+        <img class="spray-paint-overlay" id="sprayPaintOverlay" style="display: none;">
+    </div>
+
     <header>
         <a href="index.html" class="brand-name">ARCETYPE</a>
         <nav>
@@ -550,6 +664,7 @@
             <div class="product-details">
                 <h1 class="product-title" id="productName">VINTAGE TEE 001</h1>
                 <div class="product-price" id="productPrice">$45</div>
+                <div class="sold-out-tag" id="soldOutTag" style="display: none;">SOLD OUT</div>
                 
                 <p class="product-description" id="productDescription">
                     Premium vintage-washed tee. Soft, comfortable, and built to last. 
@@ -574,6 +689,11 @@
         </div>
     </div>
 
+    <!-- Cart Button -->
+    <button class="cart-button" id="cartButton">
+        GO TO CART<span class="cart-count">0</span>
+    </button>
+
     <footer>
         <div class="footer-content">
             <div class="social-links">
@@ -587,7 +707,7 @@
                     Follow on Shop
                 </a>
             </div>
-            <div class="footer-brand">ARCETYPE</div>
+            <div class="footer-brand">© 2026, arcetype</div>
         </div>
     </footer>
 
@@ -633,6 +753,66 @@
     </div>
 
     <script>
+        // localStorage cart persistence
+        let cartItems = new Map();
+        const cartButton = document.getElementById('cartButton');
+
+        function saveCart() {
+            const cartArray = Array.from(cartItems.entries());
+            localStorage.setItem('arcetypeCart', JSON.stringify(cartArray));
+        }
+
+        function loadCart() {
+            const saved = localStorage.getItem('arcetypeCart');
+            if (saved) {
+                const cartArray = JSON.parse(saved);
+                cartItems = new Map(cartArray);
+                updateCart();
+            }
+        }
+
+        function updateCart() {
+            const count = cartItems.size;
+            const countEl = cartButton.querySelector('.cart-count');
+            countEl.textContent = count;
+            
+            if (count > 0) {
+                cartButton.classList.add('visible');
+            } else {
+                cartButton.classList.remove('visible');
+            }
+        }
+
+        // Load cart on page load
+        loadCart();
+
+        // Load canvas background and spray paint
+        function loadCanvasBackground() {
+            const savedBg = localStorage.getItem('canvasBackground');
+            const savedSpray = localStorage.getItem('sprayPaint');
+            
+            const bgLayer = document.getElementById('canvasBackgroundLayer');
+            const sprayOverlay = document.getElementById('sprayPaintOverlay');
+            
+            if (savedBg && savedBg !== 'bg1.jpg') {
+                // Only override if there's a custom background (not default bg1)
+                bgLayer.style.backgroundImage = `linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%), url('${savedBg}')`;
+            }
+            
+            if (savedSpray) {
+                sprayOverlay.src = savedSpray;
+                sprayOverlay.style.display = 'block';
+            }
+        }
+
+        loadCanvasBackground();
+
+        // Cart button click
+        cartButton.addEventListener('click', () => {
+            // TODO: Navigate to Shopify checkout or cart page
+            alert(`Cart has ${cartItems.size} item(s). Shopify checkout coming soon!`);
+        });
+
         // Insiders and About popup handlers
         const insidersPage = document.getElementById('insidersPage');
         const closeInsiders = document.getElementById('closeInsiders');
@@ -700,20 +880,64 @@
                 return;
             }
             
-            // TODO: Shopify Buy Button integration
-            alert(`Added to cart: ${document.getElementById('productName').textContent} - Size ${selectedSize}`);
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = urlParams.get('id');
+            
+            if (productId && products[productId]) {
+                const product = products[productId];
+                cartItems.set(productId, { ...product, size: selectedSize });
+                updateCart();
+                saveCart();
+                alert(`Added to cart: ${product.name} - Size ${selectedSize}`);
+            }
         });
 
         // Disable add to cart initially
         addToCartBtn.disabled = true;
 
-        // TODO: Load product data from URL parameter or Shopify
+        // Product data
+        const products = {
+            1: { name: 'WASHED ONYX 001', price: '£65.99', description: 'Premium vintage-washed zip-up. Soft, comfortable, and built to last. Express yourself. Define your archetype.', soldOut: false, category: 'tops' },
+            2: { name: 'EARTH N VEIL 001', price: '£65.99', description: 'Premium vintage-washed zip-up. Soft, comfortable, and built to last. Express yourself. Define your archetype.', soldOut: false, category: 'tops' },
+            3: { name: 'WASHED ONYX 001 (BOTTOMS)', price: '£53.99', description: 'Premium vintage-washed bottoms. Soft, comfortable, and built to last. Express yourself. Define your archetype.', soldOut: false, category: 'bottoms' },
+            4: { name: 'EARTH N VEIL 001 (BOTTOMS)', price: '£53.99', description: 'Premium vintage-washed bottoms. Soft, comfortable, and built to last. Express yourself. Define your archetype.', soldOut: false, category: 'bottoms' },
+            5: { name: 'MARBLE TIDE (skull cap)', price: '£19.99', description: 'Premium skull cap. Limited edition. Sold out.', soldOut: true, category: 'accessories' },
+            6: { name: 'MIND GAMES (skull cap)', price: '£19.99', description: 'Premium skull cap. Limited edition. Sold out.', soldOut: true, category: 'accessories' },
+            7: { name: 'ELYSIAN PASTURE (skull cap)', price: '£19.99', description: 'Premium skull cap. Limited edition. Sold out.', soldOut: true, category: 'accessories' },
+            8: { name: 'FERAL REIGN (skull cap)', price: '£19.99', description: 'Premium skull cap. Limited edition. Sold out.', soldOut: true, category: 'accessories' }
+        };
+
+        // Load product data from URL parameter
         const urlParams = new URLSearchParams(window.location.search);
         const productId = urlParams.get('id');
         
-        // You'll replace this with actual Shopify product data
-        if (productId) {
-            console.log('Loading product ID:', productId);
+        if (productId && products[productId]) {
+            const product = products[productId];
+            document.getElementById('productName').textContent = product.name;
+            document.getElementById('productPrice').textContent = product.price;
+            document.getElementById('productDescription').textContent = product.description;
+            
+            // Update page title
+            document.title = `${product.name} - ARCETYPE`;
+            
+            // Show sold out tag and disable add to cart if sold out
+            if (product.soldOut) {
+                document.getElementById('soldOutTag').style.display = 'inline-block';
+                addToCartBtn.textContent = 'SOLD OUT';
+                addToCartBtn.disabled = true;
+                addToCartBtn.style.opacity = '0.5';
+                addToCartBtn.style.cursor = 'not-allowed';
+                
+                // Disable size selection
+                sizeOptions.forEach(option => {
+                    option.style.opacity = '0.5';
+                    option.style.cursor = 'not-allowed';
+                    option.style.pointerEvents = 'none';
+                });
+            }
+        } else {
+            // Default fallback
+            console.log('No product ID or invalid ID');
         }
     </script>
 </body>

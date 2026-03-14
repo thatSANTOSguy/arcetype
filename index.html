@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ARCETYPE</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -12,7 +15,7 @@
         }
 
         body {
-            font-family: 'Courier New', monospace;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
             color: #e8e8e8;
             overflow: hidden;
@@ -20,9 +23,22 @@
         }
 
         h1, h2, h3 {
-            font-family: 'Arial Black', sans-serif;
-            letter-spacing: 0.15em;
+            font-family: 'Space Grotesk', sans-serif;
+            letter-spacing: 0.08em;
             text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+        }
+
+        h2 {
+            font-size: 1.3rem;
+        }
+
+        h3 {
+            font-size: 1rem;
         }
 
         header {
@@ -42,10 +58,11 @@
         }
 
         .brand-name {
-            font-size: 1.5rem;
-            font-weight: 900;
-            letter-spacing: 0.2em;
+            font-size: 1.1rem;
+            font-weight: 500;
+            letter-spacing: 0.15em;
             color: #f5f5f5;
+            font-family: 'JetBrains Mono', monospace;
         }
 
         nav {
@@ -56,11 +73,13 @@
         nav a {
             color: #e8e8e8;
             text-decoration: none;
-            font-size: 0.9rem;
-            letter-spacing: 0.1em;
+            font-size: 0.75rem;
+            letter-spacing: 0.12em;
             transition: color 0.3s;
             border-bottom: 2px solid transparent;
             padding-bottom: 0.25rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 400;
         }
 
         nav a:hover {
@@ -91,6 +110,7 @@
             position: relative;
             z-index: 10;
             pointer-events: auto;
+            padding: 1rem 0;
         }
 
         .product-column::-webkit-scrollbar {
@@ -146,15 +166,19 @@
 
         .product-name {
             font-size: 0.75rem;
-            letter-spacing: 0.1em;
+            letter-spacing: 0.05em;
             margin-bottom: 0.25rem;
             color: #f5f5f5;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 500;
         }
 
         .product-price {
             font-size: 0.7rem;
             color: #ff3333;
             letter-spacing: 0.05em;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
         }
 
         .sold-out-badge {
@@ -167,6 +191,29 @@
             font-size: 0.6rem;
             letter-spacing: 0.1em;
             font-weight: bold;
+        }
+
+        .view-product-btn {
+            position: absolute;
+            bottom: 0.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #ff3333;
+            color: #fff;
+            text-decoration: none;
+            padding: 0.4rem 1rem;
+            font-size: 0.65rem;
+            letter-spacing: 0.1em;
+            font-weight: 600;
+            border-radius: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            transition: all 0.2s;
+            z-index: 5;
+        }
+
+        .view-product-btn:hover {
+            background: #ff0000;
+            transform: translateX(-50%) scale(1.05);
         }
 
         .center-canvas {
@@ -227,15 +274,36 @@
         }
 
         .canvas-btn {
-            width: 24px;
-            height: 24px;
+            width: 40px;
+            height: 40px;
             border: 2px solid #3a3a3a;
             cursor: pointer;
             transition: all 0.3s;
             position: relative;
             background-size: cover;
             background-position: center;
+            background-repeat: no-repeat;
             background-color: #1a1a1a;
+        }
+
+        .canvas-btn[data-canvas="1"] {
+            background-image: url('bg1.jpg');
+        }
+
+        .canvas-btn[data-canvas="2"] {
+            background-image: url('bg2.jpg');
+        }
+
+        .canvas-btn[data-canvas="3"] {
+            background-image: url('bg3.jpg');
+        }
+
+        .canvas-btn[data-canvas="4"] {
+            background-image: url('bg4.jpg');
+        }
+
+        .canvas-btn[data-canvas="5"] {
+            background-image: url('bg5.jpg');
         }
 
         .canvas-btn:hover {
@@ -372,7 +440,7 @@
             opacity: 0;
             visibility: hidden;
             z-index: 50;
-            font-family: 'Arial Black', sans-serif;
+            font-family: 'JetBrains Mono', monospace;
         }
 
         .cart-button.visible {
@@ -400,43 +468,64 @@
         }
 
         .clear-btn {
-            position: fixed;
+            position: fixed !important;
             bottom: 2rem;
             right: 2rem;
             background: transparent;
-            border: none;
+            border: 1px solid #3a3a3a;
+            border-radius: 8px;
             cursor: pointer;
-            transition: all 0.3s;
-            z-index: 60;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.5rem;
+            z-index: 150;
+            display: inline-block !important;
+            padding: 12px 16px;
+            -webkit-tap-highlight-color: transparent;
+            transition: all 0.2s;
+            width: 90px;
+            height: 90px;
+            text-align: center;
+            line-height: 1;
         }
 
         .clear-btn:hover {
-            transform: scale(1.1);
+            background: rgba(255, 51, 51, 0.1);
         }
 
-        .clear-btn:hover .trash-icon {
-            stroke: #fff;
+        .clear-btn svg,
+        .clear-btn span {
+            display: block;
+            margin: 0 auto;
+        }
+
+        .clear-btn:active {
+            box-shadow: 0 0 20px rgba(255, 51, 51, 0.6);
+            border-color: #ff3333;
+        }
+
+        .clear-btn:active .trash-icon {
+            stroke: #ff3333;
         }
 
         .trash-icon {
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             stroke: #e8e8e8;
             stroke-width: 2;
             fill: none;
-            transition: all 0.3s;
+            transition: stroke 0.2s;
+            display: inline-block;
+            vertical-align: middle;
+            margin: 8px auto 12px auto;
         }
 
         .clear-label {
-            font-size: 0.65rem;
+            font-size: 0.6rem;
             color: #888;
             letter-spacing: 0.1em;
             font-weight: 300;
             text-transform: uppercase;
+            display: block;
+            text-align: center;
+            line-height: 1.2;
         }
 
         /* Insiders Page */
@@ -465,20 +554,23 @@
         }
 
         .insiders-headline {
-            font-size: clamp(2rem, 6vw, 4rem);
-            font-weight: 900;
-            letter-spacing: 0.15em;
+            font-size: clamp(1.5rem, 4vw, 2.2rem);
+            font-weight: 600;
+            letter-spacing: 0.1em;
             color: #f5f5f5;
             margin-bottom: 1rem;
-            font-family: 'Arial Black', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
         }
 
         .insiders-subtext {
-            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            font-size: clamp(0.85rem, 1.8vw, 1rem);
             color: #888;
-            letter-spacing: 0.1em;
+            letter-spacing: 0.03em;
             margin-bottom: 3rem;
             line-height: 1.6;
+            font-family: 'Inter', sans-serif;
+            font-style: italic;
+            font-weight: 400;
         }
 
         .email-form {
@@ -496,7 +588,7 @@
             padding: 1rem 1.5rem;
             font-size: 1rem;
             letter-spacing: 0.05em;
-            font-family: 'Courier New', monospace;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             transition: all 0.3s;
             width: 100%;
         }
@@ -522,7 +614,7 @@
             font-weight: 900;
             cursor: pointer;
             transition: all 0.3s;
-            font-family: 'Arial Black', sans-serif;
+            font-family: 'JetBrains Mono', monospace;
             text-transform: uppercase;
             border-radius: 50px;
         }
@@ -682,6 +774,11 @@
                 height: 28px;
             }
 
+            .canvas-btn {
+                width: 24px;
+                height: 24px;
+            }
+
             nav {
                 gap: 0.75rem;
             }
@@ -726,15 +823,19 @@
             .clear-btn {
                 bottom: 1.5rem;
                 right: 1rem;
+                width: 70px;
+                height: 70px;
+                padding: 8px 12px;
             }
 
             .trash-icon {
-                width: 36px;
-                height: 36px;
+                width: 28px;
+                height: 28px;
+                margin: 6px auto 8px auto;
             }
 
             .clear-label {
-                font-size: 0.7rem;
+                font-size: 0.55rem;
             }
 
             /* Make dropped items smaller on mobile */
@@ -792,17 +893,23 @@
                     <div class="color-btn" data-color="#ff00ff" style="background: #ff00ff;"></div>
                 </div>
 
-                <button class="clear-btn" id="clearSpray">
-                    <svg class="trash-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M10 11v6M14 11v6"/>
-                    </svg>
-                    <span class="clear-label">Clear Paint</span>
-                </button>
             </div>
         </div>
 
         <div class="product-column" id="rightColumn"></div>
     </div>
+
+    <!-- Clear Paint Button - Outside canvas-container to avoid overflow:hidden clipping -->
+    <button class="clear-btn" id="clearSpray">
+        <svg class="trash-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 6h18"/>
+            <path d="M8 6V4c0-1 0.5-2 2-2h4c1.5 0 2 1 2 2v2"/>
+            <path d="M19 6l-1 14c-0.1 1.1-1 2-2 2H8c-1 0-1.9-0.9-2-2L5 6"/>
+            <path d="M10 11l0.5 6"/>
+            <path d="M14 11l-0.5 6"/>
+        </svg>
+        <span class="clear-label">Clear Paint</span>
+    </button>
 
     <button class="cart-button" id="cartButton">
         GO TO CART <span class="cart-count">0</span>
@@ -851,13 +958,14 @@
 
     <script>
         const products = [
-            { id: 1, name: 'VINTAGE TEE 001', price: '$45', soldOut: false },
-            { id: 2, name: 'CARGO PANTS 002', price: '$85', soldOut: false },
-            { id: 3, name: 'HOODIE 003', price: '$95', soldOut: false },
-            { id: 4, name: 'JACKET 004', price: '$125', soldOut: true },
-            { id: 5, name: 'SHORTS 005', price: '$55', soldOut: false },
-            { id: 6, name: 'SWEATPANTS 006', price: '$75', soldOut: false },
-            { id: 7, name: 'CAP 007', price: '$35', soldOut: false }
+            { id: 1, name: 'WASHED ONYX 001', price: '£65.99', soldOut: false, category: 'tops' },
+            { id: 2, name: 'EARTH N VEIL 001', price: '£65.99', soldOut: false, category: 'tops' },
+            { id: 3, name: 'WASHED ONYX 001 (BOTTOMS)', price: '£53.99', soldOut: false, category: 'bottoms' },
+            { id: 4, name: 'EARTH N VEIL 001 (BOTTOMS)', price: '£53.99', soldOut: false, category: 'bottoms' },
+            { id: 5, name: 'MARBLE TIDE (skull cap)', price: '£19.99', soldOut: true, category: 'accessories' },
+            { id: 6, name: 'MIND GAMES (skull cap)', price: '£19.99', soldOut: true, category: 'accessories' },
+            { id: 7, name: 'ELYSIAN PASTURE (skull cap)', price: '£19.99', soldOut: true, category: 'accessories' },
+            { id: 8, name: 'FERAL REIGN (skull cap)', price: '£19.99', soldOut: true, category: 'accessories' }
         ];
 
         const leftColumn = document.getElementById('leftColumn');
@@ -869,7 +977,28 @@
         let cartItems = new Map();
         let droppedItems = [];
 
+        // localStorage cart persistence
+        function saveCart() {
+            const cartArray = Array.from(cartItems.entries());
+            localStorage.setItem('arcetypeCart', JSON.stringify(cartArray));
+        }
+
+        function loadCart() {
+            const saved = localStorage.getItem('arcetypeCart');
+            if (saved) {
+                const cartArray = JSON.parse(saved);
+                cartItems = new Map(cartArray);
+                updateCart();
+            }
+        }
+
+        // Load cart on page load
+        loadCart();
+
         products.forEach((product, index) => {
+            // Skip sold out products on canvas page
+            if (product.soldOut) return;
+            
             const productEl = createProductElement(product);
             if (index % 2 === 0) {
                 leftColumn.appendChild(productEl);
@@ -889,7 +1018,47 @@
                 <div class="product-name">${product.name}</div>
                 <div class="product-price">${product.price}</div>
                 ${product.soldOut ? '<div class="sold-out-badge">SOLD OUT</div>' : ''}
+                <a href="product.html?id=${product.id}" class="view-product-btn" style="display: none;">VIEW</a>
             `;
+
+            // Double-click to go to product page
+            div.addEventListener('dblclick', (e) => {
+                e.preventDefault();
+                window.location.href = `product.html?id=${product.id}`;
+            });
+
+            // Single click without drag shows VIEW button
+            let clickTimer = null;
+            let dragStartX = 0;
+            let dragStartY = 0;
+            let hasDragged = false;
+
+            div.addEventListener('mousedown', (e) => {
+                dragStartX = e.clientX;
+                dragStartY = e.clientY;
+                hasDragged = false;
+            });
+
+            div.addEventListener('mousemove', (e) => {
+                // Only consider it a drag if moved more than 10 pixels
+                const deltaX = Math.abs(e.clientX - dragStartX);
+                const deltaY = Math.abs(e.clientY - dragStartY);
+                if (deltaX > 10 || deltaY > 10) {
+                    hasDragged = true;
+                }
+            });
+
+            div.addEventListener('click', (e) => {
+                if (!hasDragged && !e.target.classList.contains('view-product-btn')) {
+                    const viewBtn = div.querySelector('.view-product-btn');
+                    viewBtn.style.display = 'block';
+                    
+                    // Hide after 3 seconds
+                    setTimeout(() => {
+                        viewBtn.style.display = 'none';
+                    }, 3000);
+                }
+            });
 
             if (!product.soldOut) {
                 div.addEventListener('dragstart', handleDragStart);
@@ -966,6 +1135,7 @@
                         createDroppedItem(product, x, y);
                         cartItems.set(productId, product);
                         updateCart();
+                        saveCanvasState(); // Save when item dropped
                     }
                 }
                 
@@ -1000,6 +1170,7 @@
                     createDroppedItem(product, x, y);
                     cartItems.set(productId, product);
                     updateCart();
+                    saveCanvasState(); // Save when item dropped
                 }
             }
         });
@@ -1088,6 +1259,7 @@
                 if (isDragging) {
                     isDragging = false;
                     div.style.zIndex = '5';
+                    saveCanvasState(); // Save new position
                 }
             });
 
@@ -1095,6 +1267,7 @@
                 if (isDragging) {
                     isDragging = false;
                     div.style.zIndex = '5';
+                    saveCanvasState(); // Save new position
                 }
             });
 
@@ -1123,6 +1296,7 @@
             cartItems.delete(productId.toString());
             droppedItems = droppedItems.filter(item => item !== element);
             updateCart();
+            saveCanvasState(); // Save when item removed
         }
 
         function updateCart() {
@@ -1135,6 +1309,9 @@
             } else {
                 cartButton.classList.remove('visible');
             }
+            
+            // Save to localStorage
+            saveCart();
         }
 
         const canvas = document.getElementById('sprayCanvas');
@@ -1150,6 +1327,9 @@
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
             
+            // Reload spray paint after resize (resize clears canvas)
+            loadSavedSprayPaint();
+            
             // Keep dropped items within canvas bounds after resize
             droppedItems.forEach(item => {
                 const currentLeft = parseInt(item.style.left) || 0;
@@ -1162,6 +1342,19 @@
                 item.style.top = Math.max(0, Math.min(currentTop, maxY)) + 'px';
             });
         }
+
+        // Load saved spray paint onto canvas
+        function loadSavedSprayPaint() {
+            const savedSpray = localStorage.getItem('sprayPaint');
+            if (savedSpray) {
+                const img = new Image();
+                img.onload = function() {
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                };
+                img.src = savedSpray;
+            }
+        }
+
         resizeCanvas();
         window.addEventListener('resize', resizeCanvas);
 
@@ -1175,21 +1368,85 @@
 
         // Canvas background selector
         const canvasBtns = document.querySelectorAll('.canvas-btn');
+        let currentBackgroundId = '1'; // Track current background
+        
         const canvasBackgrounds = {
-            '1': '', // No background / default
-            '2': '', // Add your logo variation URLs here
-            '3': '', // e.g., 'url(logo-variant-1.png)'
-            '4': '',
-            '5': ''
+            '1': 'bg1.jpg',
+            '2': 'bg2.jpg',
+            '3': 'bg3.jpg',
+            '4': 'bg4.jpg',
+            '5': 'bg5.jpg'
         };
+
+        // Save canvas state to localStorage
+        function saveCanvasState() {
+            // Save current background
+            localStorage.setItem('canvasBackground', canvasBackgrounds[currentBackgroundId]);
+            
+            // Save spray paint as base64 image
+            const sprayCanvas = document.getElementById('sprayCanvas');
+            const sprayData = sprayCanvas.toDataURL('image/png');
+            localStorage.setItem('sprayPaint', sprayData);
+            
+            // Save dropped items positions
+            const droppedItemsData = Array.from(cartItems.entries()).map(([id, product]) => {
+                const element = document.querySelector(`.dropped-item[data-product-id="${id}"]`);
+                if (element) {
+                    return {
+                        productId: id,
+                        product: product,
+                        x: parseInt(element.style.left) || 0,
+                        y: parseInt(element.style.top) || 0
+                    };
+                }
+                return null;
+            }).filter(item => item !== null);
+            
+            localStorage.setItem('droppedItems', JSON.stringify(droppedItemsData));
+        }
+
+        // Load dropped items on page load
+        function loadDroppedItems() {
+            const savedItems = localStorage.getItem('droppedItems');
+            if (savedItems) {
+                const itemsData = JSON.parse(savedItems);
+                itemsData.forEach(itemData => {
+                    createDroppedItem(itemData.product, itemData.x, itemData.y);
+                    cartItems.set(itemData.productId, itemData.product);
+                });
+                updateCart();
+            }
+        }
+
+        // Load saved background on page load
+        function loadCanvasBackground() {
+            const savedBg = localStorage.getItem('canvasBackground');
+            if (savedBg) {
+                // Find which background ID matches
+                for (let id in canvasBackgrounds) {
+                    if (canvasBackgrounds[id] === savedBg) {
+                        currentBackgroundId = id;
+                        // Update active button
+                        canvasBtns.forEach(b => b.classList.remove('active'));
+                        const activeBtn = document.querySelector(`.canvas-btn[data-canvas="${id}"]`);
+                        if (activeBtn) activeBtn.classList.add('active');
+                        break;
+                    }
+                }
+            }
+        }
+
+        loadCanvasBackground();
+
+        // Load dropped items from previous session
+        loadDroppedItems();
 
         canvasBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 canvasBtns.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-                const canvasId = btn.dataset.canvas;
-                const bgImage = canvasBackgrounds[canvasId];
-                mainCanvas.style.backgroundImage = bgImage;
+                currentBackgroundId = btn.dataset.canvas;
+                saveCanvasState(); // Save when background changes
             });
         });
 
@@ -1198,18 +1455,26 @@
             if (!element) return false;
             
             const tagName = element.tagName?.toLowerCase();
-            const interactiveTags = ['button', 'a', 'input', 'select', 'textarea'];
+            const interactiveTags = ['button', 'a', 'input', 'select', 'textarea', 'svg', 'path'];
             
             if (interactiveTags.includes(tagName)) return true;
             if (element.classList?.contains('product-item')) return true;
             if (element.classList?.contains('dropped-item')) return true;
             if (element.classList?.contains('color-btn')) return true;
+            if (element.classList?.contains('canvas-btn')) return true;
             if (element.classList?.contains('clear-btn')) return true;
+            if (element.classList?.contains('clear-label')) return true;
+            if (element.classList?.contains('trash-icon')) return true;
             if (element.classList?.contains('cart-button')) return true;
             if (element.classList?.contains('remove-btn')) return true;
             if (element.closest('nav')) return true;
-            if (element.closest('.product-item')) return true; // Check if inside a product item
-            if (element.closest('.dropped-item')) return true; // Check if inside a dropped item
+            if (element.closest('.product-item')) return true;
+            if (element.closest('.dropped-item')) return true;
+            if (element.closest('.color-btn')) return true;
+            if (element.closest('.canvas-btn')) return true;
+            if (element.closest('.clear-btn')) return true;
+            if (element.closest('.cart-button')) return true;
+            if (element.closest('.canvas-selector')) return true;
             
             return false;
         }
@@ -1237,6 +1502,7 @@
                 isDrawing = false;
                 lastX = null;
                 lastY = null;
+                saveCanvasState(); // Save after painting
             }
         });
 
@@ -1268,6 +1534,7 @@
                 isDrawing = false;
                 lastX = null;
                 lastY = null;
+                saveCanvasState(); // Save after touch painting
             }
         });
 
@@ -1318,6 +1585,7 @@
 
         document.getElementById('clearSpray').addEventListener('click', () => {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            saveCanvasState(); // Save cleared state
         });
 
         cartButton.addEventListener('click', () => {
