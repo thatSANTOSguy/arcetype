@@ -262,6 +262,25 @@
             background-repeat: no-repeat;
         }
 
+        .canvas-placeholder {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.2rem;
+            letter-spacing: 0.2em;
+            color: rgba(136, 136, 136, 0.3);
+            font-weight: 500;
+            pointer-events: none;
+            z-index: 1;
+            transition: opacity 0.3s;
+        }
+
+        .canvas-placeholder.hidden {
+            opacity: 0;
+        }
+
         #sprayCanvas {
             position: fixed;
             top: 0;
@@ -909,6 +928,7 @@
             </div>
 
             <div class="main-canvas-area" id="mainCanvas">
+                <div class="canvas-placeholder" id="canvasPlaceholder">DRAG ITEMS HERE</div>
                 <canvas id="sprayCanvas"></canvas>
                 <div class="items-layer" id="itemsLayer"></div>
             </div>
@@ -1328,10 +1348,21 @@
             saveCanvasState(); // Save when item removed
         }
 
+        function updatePlaceholder() {
+            const placeholder = document.getElementById('canvasPlaceholder');
+            if (cartItems.size > 0) {
+                placeholder.classList.add('hidden');
+            } else {
+                placeholder.classList.remove('hidden');
+            }
+        }
+
         function updateCart() {
             const count = cartItems.size;
             const countEl = cartButton.querySelector('.cart-count');
             countEl.textContent = count;
+            
+            updatePlaceholder(); // Update placeholder visibility
             
             if (count > 0) {
                 cartButton.classList.add('visible');
@@ -1482,6 +1513,9 @@
 
         // Load dropped items from previous session
         loadDroppedItems();
+        
+        // Update placeholder visibility based on loaded items
+        updatePlaceholder();
 
         canvasBtns.forEach(btn => {
             btn.addEventListener('click', () => {
