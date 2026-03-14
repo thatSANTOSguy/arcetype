@@ -1426,6 +1426,12 @@
                 for (let id in canvasBackgrounds) {
                     if (canvasBackgrounds[id] === savedBg) {
                         currentBackgroundId = id;
+                        
+                        // Apply the background image to main canvas area
+                        const mainCanvasArea = document.querySelector('.main-canvas-area');
+                        const bgFileName = `bg${id}.jpg`;
+                        mainCanvasArea.style.backgroundImage = `url('${bgFileName}')`;
+                        
                         // Update active button
                         canvasBtns.forEach(b => b.classList.remove('active'));
                         const activeBtn = document.querySelector(`.canvas-btn[data-canvas="${id}"]`);
@@ -1446,6 +1452,12 @@
                 canvasBtns.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 currentBackgroundId = btn.dataset.canvas;
+                
+                // Apply the background image to main canvas area
+                const mainCanvasArea = document.querySelector('.main-canvas-area');
+                const bgFileName = `bg${currentBackgroundId}.jpg`;
+                mainCanvasArea.style.backgroundImage = `url('${bgFileName}')`;
+                
                 saveCanvasState(); // Save when background changes
             });
         });
