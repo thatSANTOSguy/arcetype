@@ -22,6 +22,30 @@
             height: 100vh;
         }
 
+        .canvas-background-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+            background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .spray-paint-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 1;
+        }
+
         h1, h2, h3 {
             font-family: 'Space Grotesk', sans-serif;
             letter-spacing: 0.08em;
@@ -230,8 +254,8 @@
             max-width: 900px;
             flex: 1;
             position: relative;
-            background: rgba(26, 26, 26, 0.5);
-            border: 2px solid #2a2a2a;
+            background: rgba(26, 26, 26, 0.1);
+            border: 1px solid rgba(42, 42, 42, 0.3);
             min-height: 400px;
             background-size: contain;
             background-position: center;
@@ -857,6 +881,11 @@
     </style>
 </head>
 <body>
+    <!-- Full-page background layer -->
+    <div class="canvas-background-layer" id="canvasBackgroundLayer">
+        <img class="spray-paint-overlay" id="sprayPaintOverlay" style="display: none;">
+    </div>
+
     <header>
         <div class="brand-name">ARCETYPE</div>
         <nav>
@@ -1388,6 +1417,13 @@
             const sprayData = sprayCanvas.toDataURL('image/png');
             localStorage.setItem('sprayPaint', sprayData);
             
+            // Update the spray paint overlay image for consistency across pages
+            const sprayOverlay = document.getElementById('sprayPaintOverlay');
+            if (sprayOverlay) {
+                sprayOverlay.src = sprayData;
+                sprayOverlay.style.display = 'block';
+            }
+            
             // Save dropped items positions
             const droppedItemsData = Array.from(cartItems.entries()).map(([id, product]) => {
                 const element = document.querySelector(`.dropped-item[data-product-id="${id}"]`);
@@ -1427,10 +1463,10 @@
                     if (canvasBackgrounds[id] === savedBg) {
                         currentBackgroundId = id;
                         
-                        // Apply the background image to main canvas area
-                        const mainCanvasArea = document.querySelector('.main-canvas-area');
+                        // Apply the background image to full-page background layer
+                        const bgLayer = document.getElementById('canvasBackgroundLayer');
                         const bgFileName = `bg${id}.jpg`;
-                        mainCanvasArea.style.backgroundImage = `url('${bgFileName}')`;
+                        bgLayer.style.backgroundImage = `linear-gradient(135deg, rgba(26, 26, 26, 0.3) 0%, rgba(13, 13, 13, 0.3) 100%), url('${bgFileName}')`;
                         
                         // Update active button
                         canvasBtns.forEach(b => b.classList.remove('active'));
@@ -1453,10 +1489,10 @@
                 btn.classList.add('active');
                 currentBackgroundId = btn.dataset.canvas;
                 
-                // Apply the background image to main canvas area
-                const mainCanvasArea = document.querySelector('.main-canvas-area');
+                // Apply the background image to full-page background layer
+                const bgLayer = document.getElementById('canvasBackgroundLayer');
                 const bgFileName = `bg${currentBackgroundId}.jpg`;
-                mainCanvasArea.style.backgroundImage = `url('${bgFileName}')`;
+                bgLayer.style.backgroundImage = `linear-gradient(135deg, rgba(26, 26, 26, 0.3) 0%, rgba(13, 13, 13, 0.3) 100%), url('${bgFileName}')`;
                 
                 saveCanvasState(); // Save when background changes
             });
