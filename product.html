@@ -935,9 +935,45 @@
                 cartItems.set(productId, { ...product, size: selectedSize });
                 updateCart();
                 saveCart();
+                
+                // Add to dropped items with random position on canvas
+                addToCanvasWithRandomPosition(product, selectedSize);
+                
                 alert(`Added to cart: ${product.name} - Size ${selectedSize}`);
             }
         });
+
+        // Helper function to add item to canvas with random position
+        function addToCanvasWithRandomPosition(product, size) {
+            const droppedItems = JSON.parse(localStorage.getItem('droppedItems') || '[]');
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = urlParams.get('id');
+            
+            // Check if item already exists on canvas
+            const existingIndex = droppedItems.findIndex(item => item.productId == productId);
+            
+            if (existingIndex === -1) {
+                // Generate random position within canvas bounds
+                // Using standard canvas dimensions: max-width 900px, min-height 400px
+                const canvasWidth = 900;
+                const canvasHeight = 400;
+                const itemSize = 200; // Desktop item size
+                
+                const randomX = Math.floor(Math.random() * (canvasWidth - itemSize));
+                const randomY = Math.floor(Math.random() * (canvasHeight - itemSize));
+                
+                droppedItems.push({
+                    productId: productId,
+                    product: { ...product, id: parseInt(productId) }, // Include id in product object
+                    x: randomX,
+                    y: randomY,
+                    size: size
+                });
+                
+                localStorage.setItem('droppedItems', JSON.stringify(droppedItems));
+            }
+        }
 
         // Disable add to cart initially
         addToCartBtn.disabled = true;
