@@ -34,6 +34,8 @@
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
         }
 
         .spray-paint-overlay {
@@ -761,11 +763,15 @@
 
         @media (max-width: 1024px) {
             .product-column {
-                width: 140px;
+                width: 165px;
+            }
+
+            .product-item {
+                padding: 0.5rem;
             }
 
             .product-placeholder {
-                height: 120px;
+                height: 147px;
             }
 
             .main-canvas-area {
@@ -780,8 +786,8 @@
 
         @media (max-width: 768px) {
             .product-column {
-                width: 80px;
-                gap: 1rem;
+                width: 95px;
+                gap: 0.5rem;
                 padding: 0.25rem;
             }
 
