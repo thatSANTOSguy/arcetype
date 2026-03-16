@@ -447,6 +447,70 @@
             z-index: 10;
         }
 
+        .size-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(13, 13, 13, 0.8);
+            color: #e8e8e8;
+            padding: 0.25rem 0.4rem;
+            font-size: 0.6rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            border-radius: 3px;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .size-selector {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            gap: 0.5rem;
+            background: rgba(13, 13, 13, 0.9);
+            padding: 0.75rem;
+            border-radius: 8px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s, visibility 0.2s;
+            z-index: 15;
+            pointer-events: none;
+        }
+
+        .size-selector.active {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        .size-btn {
+            width: 40px;
+            height: 40px;
+            background: transparent;
+            border: 1px solid #3a3a3a;
+            color: #888;
+            cursor: pointer;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .size-btn:hover {
+            border-color: #ff3333;
+            color: #ff3333;
+        }
+
+        .size-btn.active {
+            background: #ff3333;
+            border-color: #ff3333;
+            color: #fff;
+        }
+
         .dropped-item-img {
             width: 100%;
             height: 100%;
@@ -918,6 +982,21 @@
                 font-size: 0.7rem !important;
             }
         }
+
+        /* Specific fix for larger phones like iPhone 15 Pro Max (400-500px width) */
+        @media (min-width: 400px) and (max-width: 500px) {
+            .product-column {
+                width: 100px;
+            }
+
+            .product-item {
+                padding: 0.45rem;
+            }
+
+            .product-placeholder {
+                height: 86px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1245,9 +1324,20 @@
             }
         });
 
-        function createDroppedItem(product, x, y) {
+        function createDroppedItem(product, x, y, savedSize = null) {
             const div = document.createElement('div');
             div.className = 'dropped-item';
+            
+            // Determine if this is tops or bottoms
+            const isBottoms = product.name.toUpperCase().includes('BOTTOMS');
+            
+            // Get default size from last used or saved size
+            let defaultSize = savedSize;
+            if (!defaultSize) {
+                defaultSize = isBottoms 
+                    ? (localStorage.getItem('lastBottomsSize') || 'M')
+                    : (localStorage.getItem('lastTopSize') || 'M');
+            }
             
             // Responsive item size based on screen width
             const isMobile = window.innerWidth <= 768;
@@ -1258,21 +1348,79 @@
             div.style.width = itemSize + 'px';
             div.style.height = itemSize + 'px';
             div.dataset.productId = product.id;
+            div.dataset.size = defaultSize;
+            div.dataset.isBottoms = isBottoms;
             
             div.innerHTML = `
                 <div class="dropped-item-img">ITEM ${product.id}</div>
+                <div class="size-badge">${defaultSize}</div>
+                <div class="size-selector">
+                    <button class="size-btn ${defaultSize === 'S' ? 'active' : ''}" data-size="S">S</button>
+                    <button class="size-btn ${defaultSize === 'M' ? 'active' : ''}" data-size="M">M</button>
+                    <button class="size-btn ${defaultSize === 'L' ? 'active' : ''}" data-size="L">L</button>
+                    <button class="size-btn ${defaultSize === 'XL' ? 'active' : ''}" data-size="XL">XL</button>
+                </div>
                 <button class="remove-btn">×</button>
             `;
 
+            const sizeSelector = div.querySelector('.size-selector');
+            const sizeBadge = div.querySelector('.size-badge');
+            const sizeBtns = div.querySelectorAll('.size-btn');
             let isDragging = false;
+            let hasMoved = false;
             let offsetX, offsetY;
 
+            // Click to show size selector
+            div.addEventListener('click', (e) => {
+                if (e.target.classList.contains('remove-btn') || 
+                    e.target.classList.contains('size-btn') ||
+                    hasMoved) {
+                    return;
+                }
+                sizeSelector.classList.add('active');
+            });
+
+            // Size button clicks
+            sizeBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const newSize = btn.dataset.size;
+                    
+                    // Update active state
+                    sizeBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    // Update badge and data
+                    sizeBadge.textContent = newSize;
+                    div.dataset.size = newSize;
+                    
+                    // Save to localStorage based on type
+                    if (div.dataset.isBottoms === 'true') {
+                        localStorage.setItem('lastBottomsSize', newSize);
+                    } else {
+                        localStorage.setItem('lastTopSize', newSize);
+                    }
+                    
+                    // Hide selector after 1 second
+                    setTimeout(() => {
+                        sizeSelector.classList.remove('active');
+                    }, 1000);
+                    
+                    saveCanvasState();
+                });
+            });
+
             div.addEventListener('mousedown', (e) => {
-                if (e.target.classList.contains('remove-btn')) {
-                    removeDroppedItem(div, product.id);
+                if (e.target.classList.contains('remove-btn') || 
+                    e.target.classList.contains('size-btn')) {
+                    if (e.target.classList.contains('remove-btn')) {
+                        removeDroppedItem(div, product.id);
+                    }
                     return;
                 }
                 isDragging = true;
+                hasMoved = false;
+                sizeSelector.classList.remove('active');
                 const rect = div.getBoundingClientRect();
                 offsetX = e.clientX - rect.left;
                 offsetY = e.clientY - rect.top;
@@ -1281,12 +1429,17 @@
             });
 
             div.addEventListener('touchstart', (e) => {
-                if (e.target.classList.contains('remove-btn')) {
-                    removeDroppedItem(div, product.id);
+                if (e.target.classList.contains('remove-btn') || 
+                    e.target.classList.contains('size-btn')) {
+                    if (e.target.classList.contains('remove-btn')) {
+                        removeDroppedItem(div, product.id);
+                    }
                     return;
                 }
                 const touch = e.touches[0];
                 isDragging = true;
+                hasMoved = false;
+                sizeSelector.classList.remove('active');
                 const rect = div.getBoundingClientRect();
                 offsetX = touch.clientX - rect.left;
                 offsetY = touch.clientY - rect.top;
@@ -1296,6 +1449,7 @@
 
             document.addEventListener('mousemove', (e) => {
                 if (isDragging) {
+                    hasMoved = true;
                     e.preventDefault();
                     const canvasRect = mainCanvas.getBoundingClientRect();
                     let newX = e.clientX - canvasRect.left - offsetX;
@@ -1311,6 +1465,7 @@
 
             document.addEventListener('touchmove', (e) => {
                 if (isDragging) {
+                    hasMoved = true;
                     e.preventDefault();
                     const touch = e.touches[0];
                     const canvasRect = mainCanvas.getBoundingClientRect();
@@ -1484,7 +1639,8 @@
                         productId: id,
                         product: product,
                         x: parseInt(element.style.left) || 0,
-                        y: parseInt(element.style.top) || 0
+                        y: parseInt(element.style.top) || 0,
+                        size: element.dataset.size || 'M'
                     };
                 }
                 return null;
@@ -1499,7 +1655,7 @@
             if (savedItems) {
                 const itemsData = JSON.parse(savedItems);
                 itemsData.forEach(itemData => {
-                    createDroppedItem(itemData.product, itemData.x, itemData.y);
+                    createDroppedItem(itemData.product, itemData.x, itemData.y, itemData.size);
                     cartItems.set(itemData.productId, itemData.product);
                 });
                 updateCart();
