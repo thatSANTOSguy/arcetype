@@ -1154,8 +1154,8 @@
             return `item_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         }
 
-        // Load cart on page load
-        loadCart();
+        // Don't load cart here - it will be rebuilt from droppedItems
+        // loadCart();
 
         products.forEach((product, index) => {
             // Skip sold out products on canvas page
@@ -1676,6 +1676,9 @@
 
         // Load dropped items on page load
         function loadDroppedItems() {
+            // Clear cart first - it will be rebuilt from dropped items
+            cartItems = [];
+            
             const savedItems = localStorage.getItem('droppedItems');
             if (savedItems) {
                 const itemsData = JSON.parse(savedItems);
