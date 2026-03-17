@@ -870,24 +870,22 @@
         let currentLayout = '3col';
 
         // localStorage cart persistence
-        let cartItems = new Map();
+        let cartItems = [];
 
         function saveCart() {
-            const cartArray = Array.from(cartItems.entries());
-            localStorage.setItem('arcetypeCart', JSON.stringify(cartArray));
+            localStorage.setItem('arcetypeCart', JSON.stringify(cartItems));
         }
 
         function loadCart() {
             const saved = localStorage.getItem('arcetypeCart');
             if (saved) {
-                const cartArray = JSON.parse(saved);
-                cartItems = new Map(cartArray);
+                cartItems = JSON.parse(saved);
                 updateCart();
             }
         }
 
         function updateCart() {
-            const count = cartItems.size;
+            const count = cartItems.length;
             const countEl = cartButton.querySelector('.cart-count');
             countEl.textContent = count;
             

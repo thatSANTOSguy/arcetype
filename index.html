@@ -1133,22 +1133,25 @@
         const itemsLayer = document.getElementById('itemsLayer');
         const cartButton = document.getElementById('cartButton');
 
-        let cartItems = new Map();
+        let cartItems = []; // Changed from Map to Array to support multiple instances
         let droppedItems = [];
 
         // localStorage cart persistence
         function saveCart() {
-            const cartArray = Array.from(cartItems.entries());
-            localStorage.setItem('arcetypeCart', JSON.stringify(cartArray));
+            localStorage.setItem('arcetypeCart', JSON.stringify(cartItems));
         }
 
         function loadCart() {
             const saved = localStorage.getItem('arcetypeCart');
             if (saved) {
-                const cartArray = JSON.parse(saved);
-                cartItems = new Map(cartArray);
+                cartItems = JSON.parse(saved);
                 updateCart();
             }
+        }
+
+        // Generate unique instance ID
+        function generateInstanceId() {
+            return `item_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         }
 
         // Load cart on page load
@@ -1292,7 +1295,6 @@
                         const y = touch.clientY - canvasRect.top - 100;
                         
                         createDroppedItem(product, x, y);
-                        cartItems.set(productId, product);
                         updateCart();
                         saveCanvasState(); // Save when item dropped
                     }
@@ -1327,16 +1329,18 @@
                     const y = e.clientY - rect.top - 100;
                     
                     createDroppedItem(product, x, y);
-                    cartItems.set(productId, product);
                     updateCart();
                     saveCanvasState(); // Save when item dropped
                 }
             }
         });
 
-        function createDroppedItem(product, x, y, savedSize = null) {
+        function createDroppedItem(product, x, y, savedSize = null, instanceId = null) {
             const div = document.createElement('div');
             div.className = 'dropped-item';
+            
+            // Generate or use existing instance ID
+            const itemInstanceId = instanceId || generateInstanceId();
             
             // Determine if this is tops or bottoms
             const isBottoms = product.name.toUpperCase().includes('BOTTOMS');
@@ -1357,6 +1361,7 @@
             div.style.top = Math.max(0, Math.min(y, mainCanvas.offsetHeight - itemSize)) + 'px';
             div.style.width = itemSize + 'px';
             div.style.height = itemSize + 'px';
+            div.dataset.instanceId = itemInstanceId;
             div.dataset.productId = product.id;
             div.dataset.size = defaultSize;
             div.dataset.isBottoms = isBottoms;
@@ -1424,7 +1429,7 @@
                 if (e.target.classList.contains('remove-btn') || 
                     e.target.classList.contains('size-btn')) {
                     if (e.target.classList.contains('remove-btn')) {
-                        removeDroppedItem(div, product.id);
+                        removeDroppedItem(div, itemInstanceId);
                     }
                     return;
                 }
@@ -1442,7 +1447,7 @@
                 if (e.target.classList.contains('remove-btn') || 
                     e.target.classList.contains('size-btn')) {
                     if (e.target.classList.contains('remove-btn')) {
-                        removeDroppedItem(div, product.id);
+                        removeDroppedItem(div, itemInstanceId);
                     }
                     return;
                 }
@@ -1524,11 +1529,20 @@
             };
             
             window.addEventListener('resize', constrainItem);
+            
+            // Add to cart array
+            cartItems.push({
+                instanceId: itemInstanceId,
+                product: product,
+                size: defaultSize
+            });
+            
+            return itemInstanceId;
         }
 
-        function removeDroppedItem(element, productId) {
+        function removeDroppedItem(element, instanceId) {
             element.remove();
-            cartItems.delete(productId.toString());
+            cartItems = cartItems.filter(item => item.instanceId !== instanceId);
             droppedItems = droppedItems.filter(item => item !== element);
             updateCart();
             saveCanvasState(); // Save when item removed
@@ -1536,7 +1550,7 @@
 
         function updatePlaceholder() {
             const placeholder = document.getElementById('canvasPlaceholder');
-            if (cartItems.size > 0) {
+            if (cartItems.length > 0) {
                 placeholder.classList.add('hidden');
             } else {
                 placeholder.classList.remove('hidden');
@@ -1544,7 +1558,7 @@
         }
 
         function updateCart() {
-            const count = cartItems.size;
+            const count = cartItems.length;
             const countEl = cartButton.querySelector('.cart-count');
             countEl.textContent = count;
             
@@ -1641,16 +1655,17 @@
                 sprayOverlay.style.display = 'block';
             }
             
-            // Save dropped items positions
-            const droppedItemsData = Array.from(cartItems.entries()).map(([id, product]) => {
-                const element = document.querySelector(`.dropped-item[data-product-id="${id}"]`);
+            // Save dropped items positions with instanceIds
+            const droppedItemsData = cartItems.map(cartItem => {
+                const element = document.querySelector(`.dropped-item[data-instance-id="${cartItem.instanceId}"]`);
                 if (element) {
                     return {
-                        productId: id,
-                        product: product,
+                        instanceId: cartItem.instanceId,
+                        productId: cartItem.product.id,
+                        product: cartItem.product,
                         x: parseInt(element.style.left) || 0,
                         y: parseInt(element.style.top) || 0,
-                        size: element.dataset.size || 'M'
+                        size: element.dataset.size || cartItem.size
                     };
                 }
                 return null;
@@ -1665,8 +1680,7 @@
             if (savedItems) {
                 const itemsData = JSON.parse(savedItems);
                 itemsData.forEach(itemData => {
-                    createDroppedItem(itemData.product, itemData.x, itemData.y, itemData.size);
-                    cartItems.set(itemData.productId, itemData.product);
+                    createDroppedItem(itemData.product, itemData.x, itemData.y, itemData.size, itemData.instanceId);
                 });
                 updateCart();
             }
