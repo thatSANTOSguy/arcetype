@@ -21,6 +21,8 @@
             overflow-x: hidden;
             min-height: 100vh;
             position: relative;
+            display: flex;
+            flex-direction: column;
         }
 
         /* Canvas Background Layer */
@@ -161,6 +163,7 @@
             backdrop-filter: blur(2px);
             -webkit-backdrop-filter: blur(2px);
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+            flex: 1;
         }
 
         .product-container::before {
@@ -190,13 +193,46 @@
         }
 
         .back-link {
-            color: #888;
+            color: #b8b8b8;
             text-decoration: none;
             font-size: 0.9rem;
             letter-spacing: 0.1em;
             margin-bottom: 2rem;
             display: inline-block;
             transition: all 0.3s;
+            position: relative;
+            padding: 0.2rem 0.5rem;
+            width: fit-content;
+        }
+
+        .back-link::before {
+            content: '';
+            position: absolute;
+            top: 0px;
+            left: -1px;
+            right: 0px;
+            bottom: -1px;
+            background: rgba(0, 0, 0, 0.90);
+            z-index: -1;
+            border-radius: 7px 6px 8px 5px;
+            transform: rotate(-0.3deg) skewX(-0.2deg);
+            box-shadow: 
+                -1px 0 2px rgba(0, 0, 0, 0.25),
+                1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .back-link::after {
+            content: '';
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            right: -1px;
+            bottom: 0px;
+            background: rgba(0, 0, 0, 0.06);
+            z-index: -2;
+            border-radius: 6px 7px 5px 8px;
+            transform: rotate(-0.2deg);
+            filter: blur(1.5px);
         }
 
         .back-link:hover {
@@ -241,6 +277,40 @@
             letter-spacing: 0.08em;
             color: #f5f5f5;
             font-family: 'JetBrains Mono', monospace;
+            position: relative;
+            padding: 0.25rem 0.6rem;
+            width: fit-content;
+        }
+
+        .product-title::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: -2px;
+            right: 1px;
+            bottom: 0px;
+            background: rgba(0, 0, 0, 0.90);
+            z-index: -1;
+            border-radius: 11px 9px 8px 10px;
+            transform: rotate(-0.6deg) skewX(-0.4deg);
+            box-shadow: 
+                -1px 0 2px rgba(0, 0, 0, 0.3),
+                1px 1px 3px rgba(0, 0, 0, 0.2),
+                0 0 0 1px rgba(0, 0, 0, 0.15);
+        }
+
+        .product-title::after {
+            content: '';
+            position: absolute;
+            top: 1px;
+            left: 1px;
+            right: -1px;
+            bottom: -1px;
+            background: rgba(0, 0, 0, 0.08);
+            z-index: -2;
+            border-radius: 10px 8px 9px 11px;
+            transform: rotate(-0.5deg);
+            filter: blur(2px);
         }
 
         .product-price {
@@ -249,6 +319,39 @@
             letter-spacing: 0.05em;
             font-weight: 600;
             font-family: 'JetBrains Mono', monospace;
+            position: relative;
+            padding: 0.2rem 0.5rem;
+            width: fit-content;
+        }
+
+        .product-price::before {
+            content: '';
+            position: absolute;
+            top: 0px;
+            left: -1px;
+            right: 0px;
+            bottom: -1px;
+            background: rgba(0, 0, 0, 0.90);
+            z-index: -1;
+            border-radius: 7px 9px 6px 8px;
+            transform: rotate(0.4deg) skewX(0.2deg);
+            box-shadow: 
+                -1px 0 2px rgba(0, 0, 0, 0.25),
+                1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .product-price::after {
+            content: '';
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            right: -1px;
+            bottom: 0px;
+            background: rgba(0, 0, 0, 0.06);
+            z-index: -2;
+            border-radius: 8px 7px 8px 6px;
+            transform: rotate(0.3deg);
+            filter: blur(1.5px);
         }
 
         .sold-out-tag {
@@ -266,10 +369,43 @@
         .product-description {
             font-size: 0.95rem;
             line-height: 1.8;
-            color: #888;
+            color: #b8b8b8;
             letter-spacing: 0.02em;
             font-family: 'Inter', sans-serif;
             font-weight: 400;
+            position: relative;
+            padding: 0.35rem 0.6rem;
+            width: fit-content;
+        }
+
+        .product-description::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: -2px;
+            right: 1px;
+            bottom: 0px;
+            background: rgba(0, 0, 0, 0.90);
+            z-index: -1;
+            border-radius: 10px 7px 9px 8px;
+            transform: rotate(0.3deg) skewX(0.2deg);
+            box-shadow: 
+                -1px 0 3px rgba(0, 0, 0, 0.3),
+                1px 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        .product-description::after {
+            content: '';
+            position: absolute;
+            top: 1px;
+            left: 1px;
+            right: -1px;
+            bottom: -1px;
+            background: rgba(0, 0, 0, 0.08);
+            z-index: -2;
+            border-radius: 9px 8px 7px 10px;
+            transform: rotate(0.2deg);
+            filter: blur(2px);
         }
 
         .size-selector {
@@ -281,7 +417,40 @@
         .size-label {
             font-size: 0.9rem;
             letter-spacing: 0.1em;
-            color: #888;
+            color: #b8b8b8;
+            position: relative;
+            width: fit-content;
+            padding: 0.2rem 0.5rem;
+        }
+
+        .size-label::before {
+            content: '';
+            position: absolute;
+            top: 0px;
+            left: -1px;
+            right: 0px;
+            bottom: -1px;
+            background: rgba(0, 0, 0, 0.90);
+            z-index: -1;
+            border-radius: 6px 8px 5px 7px;
+            transform: rotate(-0.4deg) skewX(-0.3deg);
+            box-shadow: 
+                -1px 0 2px rgba(0, 0, 0, 0.25),
+                1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .size-label::after {
+            content: '';
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            right: -1px;
+            bottom: 0px;
+            background: rgba(0, 0, 0, 0.06);
+            z-index: -2;
+            border-radius: 7px 6px 8px 5px;
+            transform: rotate(-0.3deg);
+            filter: blur(1.5px);
         }
 
         .size-options {
@@ -291,9 +460,11 @@
         }
 
         .size-option {
-            background: transparent;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             border: 2px solid #3a3a3a;
-            color: #e8e8e8;
+            color: #b8b8b8;
             padding: 0.75rem 1.5rem;
             font-size: 0.9rem;
             letter-spacing: 0.1em;
@@ -303,11 +474,15 @@
         }
 
         .size-option:hover {
+            background: rgba(255, 255, 255, 0.05);
             border-color: #ff3333;
+            color: #ff3333;
         }
 
         .size-option.selected {
             background: #ff3333;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
             border-color: #ff3333;
             color: #fff;
         }
@@ -602,7 +777,7 @@
             background: #0d0d0d;
             border-top: 1px solid #2a2a2a;
             padding: 3rem 2rem;
-            margin-top: 4rem;
+            margin-top: auto;
         }
 
         .footer-content {
@@ -685,6 +860,16 @@
     </style>
 </head>
 <body>
+    <!-- SVG Filter for rough marker effect -->
+    <svg width="0" height="0" style="position: absolute;">
+        <defs>
+            <filter id="marker-rough">
+                <feTurbulence type="fractalNoise" baseFrequency="0.01 0.025" numOctaves="3" result="noise"/>
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="6 4" xChannelSelector="R" yChannelSelector="G"/>
+            </filter>
+        </defs>
+    </svg>
+
     <!-- Canvas Background Layer -->
     <div class="canvas-background-layer" id="canvasBackgroundLayer">
         <img class="spray-paint-overlay" id="sprayPaintOverlay" style="display: none;">
