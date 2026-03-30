@@ -1443,6 +1443,23 @@
         // Clear existing buttons
         sizeOptionsContainer.innerHTML = '';
         
+        // Check if this is a one-size product
+        const isOneSize = product.variants && product.variants.length === 1 && 
+                          (product.variants[0].title.toUpperCase().includes('ONE SIZE') || 
+                           product.variants[0].title.toUpperCase() === 'DEFAULT TITLE');
+        
+        if (isOneSize) {
+            // Hide size selector for one-size products
+            const sizeSelector = document.querySelector('.size-selector');
+            if (sizeSelector) {
+                sizeSelector.style.display = 'none';
+            }
+            // Enable add to cart for one-size products
+            addToCartBtn.disabled = false;
+            selectedSize = 'ONE SIZE';
+            return;
+        }
+        
         if (!product.variants || product.variants.length === 0) {
             // Fallback: create standard sizes
             ['XS', 'S', 'M', 'L', 'XL'].forEach(size => {
@@ -1460,6 +1477,9 @@
             product.variants.forEach(variant => {
                 let size = variant.title.toUpperCase().trim();
                 
+                // Skip "Default Title" variants
+                if (size === 'DEFAULT TITLE') return;
+                
                 // Normalize common size names
                 if (size.includes('EXTRA SMALL') || size === 'XS') size = 'XS';
                 else if (size.includes('SMALL') && !size.includes('EXTRA')) size = 'S';
@@ -1471,6 +1491,17 @@
                 availableSizes.add(size);
                 sizeAvailability[size] = variant.available;
             });
+            
+            // If no sizes found after filtering, hide selector
+            if (availableSizes.size === 0) {
+                const sizeSelector = document.querySelector('.size-selector');
+                if (sizeSelector) {
+                    sizeSelector.style.display = 'none';
+                }
+                addToCartBtn.disabled = false;
+                selectedSize = 'ONE SIZE';
+                return;
+            }
             
             // Sort sizes by standard order
             const sortedSizes = standardSizes.filter(size => availableSizes.has(size));

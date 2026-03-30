@@ -1001,6 +1001,7 @@
                                     node {
                                         id
                                         title
+                                        description
                                         availableForSale
                                         priceRange {
                                             minVariantPrice {
@@ -1061,6 +1062,7 @@
                         id: index + 1,
                         shopifyId: product.id,
                         name: product.title,
+                        description: product.description || 'Express yourself. Define your archetype.',
                         price: formattedPrice,
                         soldOut: !product.availableForSale,
                         category: category,

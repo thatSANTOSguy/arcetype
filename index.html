@@ -1154,6 +1154,7 @@
                                     node {
                                         id
                                         title
+                                        description
                                         availableForSale
                                         priceRange {
                                             minVariantPrice {
@@ -1214,6 +1215,7 @@
                         id: index + 1,
                         shopifyId: product.id,
                         name: product.title,
+                        description: product.description || 'Express yourself. Define your archetype.',
                         price: formattedPrice,
                         soldOut: !product.availableForSale,
                         category: category,
@@ -1482,6 +1484,22 @@
             // Standard size order
             const standardSizes = ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', '2XL', '3XL'];
             
+            // Check if this is a one-size product
+            const isOneSize = product.variants && product.variants.length === 1 && 
+                              (product.variants[0].title.toUpperCase().includes('ONE SIZE') || 
+                               product.variants[0].title.toUpperCase() === 'DEFAULT TITLE');
+            
+            if (isOneSize) {
+                // Don't show size selector for one-size products
+                container.style.display = 'none';
+                const parent = container.closest('.dropped-item');
+                if (parent) {
+                    const sizeBadge = parent.querySelector('.size-badge');
+                    if (sizeBadge) sizeBadge.style.display = 'none';
+                }
+                return;
+            }
+            
             // If product has variants, use them
             if (product.variants && product.variants.length > 0) {
                 // Extract unique sizes from variants
@@ -1491,6 +1509,9 @@
                 product.variants.forEach(variant => {
                     // Extract size from variant title (e.g., "S", "Medium", "Small")
                     let size = variant.title.toUpperCase().trim();
+                    
+                    // Skip "Default Title" variants
+                    if (size === 'DEFAULT TITLE') return;
                     
                     // Normalize common size names
                     if (size.includes('EXTRA SMALL') || size === 'XS') size = 'XS';
@@ -1503,6 +1524,12 @@
                     availableSizes.add(size);
                     sizeAvailability[size] = variant.available;
                 });
+                
+                // If no sizes found, hide selector
+                if (availableSizes.size === 0) {
+                    container.style.display = 'none';
+                    return;
+                }
                 
                 // Sort sizes by standard order
                 const sortedSizes = standardSizes.filter(size => availableSizes.has(size));
