@@ -967,11 +967,8 @@
 
                 <div class="size-selector">
                     <div class="size-label">SELECT SIZE</div>
-                    <div class="size-options">
-                        <button class="size-option" data-size="S">S</button>
-                        <button class="size-option" data-size="M">M</button>
-                        <button class="size-option" data-size="L">L</button>
-                        <button class="size-option" data-size="XL">XL</button>
+                    <div class="size-options" id="sizeOptions">
+                        <!-- Size buttons will be dynamically added based on variants -->
                     </div>
                 </div>
 
@@ -1156,19 +1153,7 @@
         const addToCartBtn = document.getElementById('addToCart');
         let selectedSize = null;
 
-        sizeOptions.forEach(option => {
-            option.addEventListener('click', () => {
-                // Don't allow selecting sold out sizes
-                if (option.disabled || option.classList.contains('sold-out')) {
-                    return;
-                }
-                
-                sizeOptions.forEach(opt => opt.classList.remove('selected'));
-                option.classList.add('selected');
-                selectedSize = option.dataset.size;
-                addToCartBtn.disabled = false;
-            });
-        });
+        // Size option listeners are now added dynamically in handleVariantAvailability()
 
         // Add to cart
         addToCartBtn.addEventListener('click', () => {
@@ -1452,27 +1437,77 @@
 
     // Handle size availability based on Shopify variants
     function handleVariantAvailability(product) {
+        const sizeOptionsContainer = document.getElementById('sizeOptions');
+        const standardSizes = ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', '2XL', '3XL'];
+        
+        // Clear existing buttons
+        sizeOptionsContainer.innerHTML = '';
+        
         if (!product.variants || product.variants.length === 0) {
-            return; // No variants, all sizes available by default
-        }
-
-        sizeOptions.forEach(option => {
-            const size = option.dataset.size;
+            // Fallback: create standard sizes
+            ['XS', 'S', 'M', 'L', 'XL'].forEach(size => {
+                const button = document.createElement('button');
+                button.className = 'size-option';
+                button.dataset.size = size;
+                button.textContent = size;
+                sizeOptionsContainer.appendChild(button);
+            });
+        } else {
+            // Extract unique sizes from variants
+            const availableSizes = new Set();
+            const sizeAvailability = {};
             
-            // Find matching variant (case-insensitive)
-            const matchingVariant = product.variants.find(v => 
-                v.title.toUpperCase() === size || 
-                v.title.toUpperCase().includes(size)
-            );
-
-            if (matchingVariant && !matchingVariant.available) {
-                // This size is sold out
-                option.classList.add('sold-out');
-                option.disabled = true;
-                option.style.opacity = '0.3';
-                option.style.cursor = 'not-allowed';
-                option.style.textDecoration = 'line-through';
-            }
+            product.variants.forEach(variant => {
+                let size = variant.title.toUpperCase().trim();
+                
+                // Normalize common size names
+                if (size.includes('EXTRA SMALL') || size === 'XS') size = 'XS';
+                else if (size.includes('SMALL') && !size.includes('EXTRA')) size = 'S';
+                else if (size.includes('MEDIUM')) size = 'M';
+                else if (size.includes('LARGE') && !size.includes('EXTRA')) size = 'L';
+                else if (size.includes('EXTRA LARGE') || size === 'XL') size = 'XL';
+                else if (size.includes('XXL') || size === '2XL') size = 'XXL';
+                
+                availableSizes.add(size);
+                sizeAvailability[size] = variant.available;
+            });
+            
+            // Sort sizes by standard order
+            const sortedSizes = standardSizes.filter(size => availableSizes.has(size));
+            
+            // Create buttons for each available size
+            sortedSizes.forEach(size => {
+                const button = document.createElement('button');
+                button.className = 'size-option';
+                button.dataset.size = size;
+                button.textContent = size;
+                
+                // Disable if sold out
+                if (!sizeAvailability[size]) {
+                    button.disabled = true;
+                    button.classList.add('sold-out');
+                    button.style.opacity = '0.3';
+                    button.style.textDecoration = 'line-through';
+                    button.style.cursor = 'not-allowed';
+                }
+                
+                sizeOptionsContainer.appendChild(button);
+            });
+        }
+        
+        // Re-attach event listeners to new buttons
+        const newSizeOptions = sizeOptionsContainer.querySelectorAll('.size-option');
+        newSizeOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                if (option.disabled || option.classList.contains('sold-out')) {
+                    return;
+                }
+                
+                newSizeOptions.forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+                selectedSize = option.dataset.size;
+                addToCartBtn.disabled = false;
+            });
         });
     }
 

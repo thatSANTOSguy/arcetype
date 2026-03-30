@@ -171,8 +171,10 @@
         }
 
         .product-item {
-            background: #2a2a2a;
-            border: 1px solid #3a3a3a;
+            background: rgba(26, 26, 26, 0.6);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             padding: 0.75rem;
             cursor: grab;
             transition: all 0.3s;
@@ -182,6 +184,7 @@
 
         .product-item:hover {
             border-color: #ff3333;
+            background: rgba(26, 26, 26, 0.8);
             box-shadow: 0 0 20px rgba(255, 51, 51, 0.3);
             transform: translateY(-2px);
         }
@@ -1225,6 +1228,12 @@
                 });
 
                 console.log(`Loaded ${products.length} products from Shopify`);
+                
+                // Debug: log first product's variants
+                if (products.length > 0 && products[0].variants) {
+                    console.log('Sample product variants:', products[0].name, products[0].variants);
+                }
+                
                 return products;
 
             } catch (error) {
@@ -1468,6 +1477,74 @@
             }
         });
 
+        // Build size buttons dynamically from product variants
+        function buildSizeButtons(container, product, activeSize) {
+            // Standard size order
+            const standardSizes = ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', '2XL', '3XL'];
+            
+            // If product has variants, use them
+            if (product.variants && product.variants.length > 0) {
+                // Extract unique sizes from variants
+                const availableSizes = new Set();
+                const sizeAvailability = {};
+                
+                product.variants.forEach(variant => {
+                    // Extract size from variant title (e.g., "S", "Medium", "Small")
+                    let size = variant.title.toUpperCase().trim();
+                    
+                    // Normalize common size names
+                    if (size.includes('EXTRA SMALL') || size === 'XS') size = 'XS';
+                    else if (size.includes('SMALL') && !size.includes('EXTRA')) size = 'S';
+                    else if (size.includes('MEDIUM')) size = 'M';
+                    else if (size.includes('LARGE') && !size.includes('EXTRA')) size = 'L';
+                    else if (size.includes('EXTRA LARGE') || size === 'XL') size = 'XL';
+                    else if (size.includes('XXL') || size === '2XL') size = 'XXL';
+                    
+                    availableSizes.add(size);
+                    sizeAvailability[size] = variant.available;
+                });
+                
+                // Sort sizes by standard order
+                const sortedSizes = standardSizes.filter(size => availableSizes.has(size));
+                
+                // Create buttons for each available size
+                sortedSizes.forEach(size => {
+                    const button = document.createElement('button');
+                    button.className = 'size-btn';
+                    button.dataset.size = size;
+                    button.textContent = size;
+                    
+                    if (size === activeSize) {
+                        button.classList.add('active');
+                    }
+                    
+                    // Disable if sold out
+                    if (!sizeAvailability[size]) {
+                        button.disabled = true;
+                        button.style.opacity = '0.3';
+                        button.style.textDecoration = 'line-through';
+                        button.style.cursor = 'not-allowed';
+                    }
+                    
+                    container.appendChild(button);
+                });
+            } else {
+                // Fallback: create standard sizes if no variants
+                ['XS', 'S', 'M', 'L', 'XL'].forEach(size => {
+                    const button = document.createElement('button');
+                    button.className = 'size-btn';
+                    button.dataset.size = size;
+                    button.textContent = size;
+                    
+                    if (size === activeSize) {
+                        button.classList.add('active');
+                    }
+                    
+                    container.appendChild(button);
+                });
+            }
+        }
+
         function createDroppedItem(product, x, y, savedSize = null, instanceId = null) {
             const div = document.createElement('div');
             div.className = 'dropped-item';
@@ -1503,18 +1580,19 @@
             div.innerHTML = `
                 ${product.image ? `<img src="${product.image}" alt="${product.name}" class="dropped-item-img" draggable="false">` : `<div class="dropped-item-img">ITEM ${product.id}</div>`}
                 <div class="size-badge">${defaultSize}</div>
-                <div class="size-selector">
-                    <button class="size-btn ${defaultSize === 'S' ? 'active' : ''}" data-size="S">S</button>
-                    <button class="size-btn ${defaultSize === 'M' ? 'active' : ''}" data-size="M">M</button>
-                    <button class="size-btn ${defaultSize === 'L' ? 'active' : ''}" data-size="L">L</button>
-                    <button class="size-btn ${defaultSize === 'XL' ? 'active' : ''}" data-size="XL">XL</button>
+                <div class="size-selector" data-product-id="${product.id}">
+                    <!-- Size buttons will be dynamically added based on variants -->
                 </div>
                 <button class="remove-btn">×</button>
             `;
 
             const sizeSelector = div.querySelector('.size-selector');
             const sizeBadge = div.querySelector('.size-badge');
-            const sizeBtns = div.querySelectorAll('.size-btn');
+            
+            // Build size buttons dynamically from product variants
+            buildSizeButtons(sizeSelector, product, defaultSize);
+            
+            const sizeBtns = sizeSelector.querySelectorAll('.size-btn');
             let isDragging = false;
             let hasMoved = false;
             let offsetX, offsetY;
