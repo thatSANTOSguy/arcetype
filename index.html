@@ -1116,16 +1116,123 @@
     </div>
 
     <script>
-        const products = [
-            { id: 1, name: 'WASHED ONYX 001', price: '£65.99', soldOut: false, category: 'tops' },
-            { id: 2, name: 'EARTH N VEIL 001', price: '£65.99', soldOut: false, category: 'tops' },
-            { id: 3, name: 'WASHED ONYX 001 (BOTTOMS)', price: '£53.99', soldOut: false, category: 'bottoms' },
-            { id: 4, name: 'EARTH N VEIL 001 (BOTTOMS)', price: '£53.99', soldOut: false, category: 'bottoms' },
-            { id: 5, name: 'MARBLE TIDE (skull cap)', price: '£19.99', soldOut: true, category: 'accessories' },
-            { id: 6, name: 'MIND GAMES (skull cap)', price: '£19.99', soldOut: true, category: 'accessories' },
-            { id: 7, name: 'ELYSIAN PASTURE (skull cap)', price: '£19.99', soldOut: true, category: 'accessories' },
-            { id: 8, name: 'FERAL REIGN (skull cap)', price: '£19.99', soldOut: true, category: 'accessories' }
-        ];
+        // Shopify Configuration
+        const SHOPIFY_STORE_DOMAIN = 'arcetypeworld.com';
+        const STOREFRONT_ACCESS_TOKEN = 'fe3392cc044c95bedf43065260103e36';
+        
+        let products = [];
+
+        // Fetch products from Shopify
+        async function fetchShopifyProducts() {
+            try {
+                const response = await fetch(`https://${SHOPIFY_STORE_DOMAIN}/api/2024-01/graphql.json`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Shopify-Storefront-Access-Token': STOREFRONT_ACCESS_TOKEN
+                    },
+                    body: JSON.stringify({
+                        query: `{
+                            products(first: 50) {
+                                edges {
+                                    node {
+                                        id
+                                        title
+                                        availableForSale
+                                        priceRange {
+                                            minVariantPrice {
+                                                amount
+                                                currencyCode
+                                            }
+                                        }
+                                        images(first: 1) {
+                                            edges {
+                                                node {
+                                                    url
+                                                }
+                                            }
+                                        }
+                                        variants(first: 10) {
+                                            edges {
+                                                node {
+                                                    id
+                                                    title
+                                                    availableForSale
+                                                }
+                                            }
+                                        }
+                                        tags
+                                    }
+                                }
+                            }
+                        }`
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.errors) {
+                    console.error('Shopify API errors:', data.errors);
+                    return getFallbackProducts();
+                }
+
+                // Transform Shopify products to our format
+                products = data.data.products.edges.map((edge, index) => {
+                    const product = edge.node;
+                    const price = parseFloat(product.priceRange.minVariantPrice.amount);
+                    const currency = product.priceRange.minVariantPrice.currencyCode;
+                    const formattedPrice = currency === 'GBP' ? `£${price.toFixed(2)}` : `${currency} ${price.toFixed(2)}`;
+                    
+                    // Determine category from tags or title
+                    let category = 'accessories';
+                    const titleLower = product.title.toLowerCase();
+                    const tagsLower = product.tags.map(t => t.toLowerCase());
+                    
+                    if (tagsLower.includes('tops') || titleLower.includes('hoodie') || titleLower.includes('shirt') || titleLower.includes('jacket')) {
+                        category = 'tops';
+                    } else if (tagsLower.includes('bottoms') || titleLower.includes('pants') || titleLower.includes('jeans') || titleLower.includes('shorts')) {
+                        category = 'bottoms';
+                    }
+                    
+                    return {
+                        id: index + 1,
+                        shopifyId: product.id,
+                        name: product.title,
+                        price: formattedPrice,
+                        soldOut: !product.availableForSale,
+                        category: category,
+                        image: product.images.edges[0]?.node.url || '',
+                        variants: product.variants.edges.map(v => ({
+                            id: v.node.id,
+                            title: v.node.title,
+                            available: v.node.availableForSale
+                        }))
+                    };
+                });
+
+                console.log(`Loaded ${products.length} products from Shopify`);
+                return products;
+
+            } catch (error) {
+                console.error('Error fetching Shopify products:', error);
+                return getFallbackProducts();
+            }
+        }
+
+        // Fallback products if Shopify fetch fails
+        function getFallbackProducts() {
+            console.log('Using fallback products');
+            return [
+                { id: 1, name: 'WASHED ONYX 001', price: '£65.99', soldOut: false, category: 'tops' },
+                { id: 2, name: 'EARTH N VEIL 001', price: '£65.99', soldOut: false, category: 'tops' },
+                { id: 3, name: 'WASHED ONYX 001 (BOTTOMS)', price: '£53.99', soldOut: false, category: 'bottoms' },
+                { id: 4, name: 'EARTH N VEIL 001 (BOTTOMS)', price: '£53.99', soldOut: false, category: 'bottoms' },
+                { id: 5, name: 'MARBLE TIDE (skull cap)', price: '£19.99', soldOut: true, category: 'accessories' },
+                { id: 6, name: 'MIND GAMES (skull cap)', price: '£19.99', soldOut: true, category: 'accessories' },
+                { id: 7, name: 'ELYSIAN PASTURE (skull cap)', price: '£19.99', soldOut: true, category: 'accessories' },
+                { id: 8, name: 'FERAL REIGN (skull cap)', price: '£19.99', soldOut: true, category: 'accessories' }
+            ];
+        }
 
         const leftColumn = document.getElementById('leftColumn');
         const rightColumn = document.getElementById('rightColumn');
@@ -1154,20 +1261,32 @@
             return `item_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         }
 
+        // Initialize app - fetch products then render
+        async function initApp() {
+            // Fetch products from Shopify
+            products = await fetchShopifyProducts();
+            
+            // Render products in columns
+            products.forEach((product, index) => {
+                // Skip sold out products on canvas page
+                if (product.soldOut) return;
+                
+                const productEl = createProductElement(product);
+                if (index % 2 === 0) {
+                    leftColumn.appendChild(productEl);
+                } else {
+                    rightColumn.appendChild(productEl);
+                }
+            });
+
+            // Load saved items and canvas state
+            loadDroppedItems();
+            loadCanvasBackground();
+            loadSprayPaint();
+        }
+
         // Don't load cart here - it will be rebuilt from droppedItems
         // loadCart();
-
-        products.forEach((product, index) => {
-            // Skip sold out products on canvas page
-            if (product.soldOut) return;
-            
-            const productEl = createProductElement(product);
-            if (index % 2 === 0) {
-                leftColumn.appendChild(productEl);
-            } else {
-                rightColumn.appendChild(productEl);
-            }
-        });
 
         function createProductElement(product) {
             const div = document.createElement('div');
@@ -1713,10 +1832,6 @@
             }
         }
 
-        loadCanvasBackground();
-
-        // Load dropped items from previous session
-        loadDroppedItems();
         
         // Update placeholder visibility based on loaded items
         updatePlaceholder();
@@ -1874,9 +1989,99 @@
             saveCanvasState(); // Save cleared state
         });
 
-        cartButton.addEventListener('click', () => {
-            alert(`Ready for Shopify checkout!\nItems: ${cartItems.size}`);
+        cartButton.addEventListener('click', async () => {
+            if (cartItems.size === 0) {
+                alert('Your cart is empty! Drag items to the canvas to add them.');
+                return;
+            }
+
+            // Build Shopify checkout with cart items
+            await redirectToShopifyCheckout();
         });
+
+        // Redirect to Shopify checkout with cart items
+        async function redirectToShopifyCheckout() {
+            try {
+                // Get cart items from localStorage
+                const cart = JSON.parse(localStorage.getItem('arcetypeCart') || '[]');
+                
+                if (cart.length === 0) {
+                    alert('Your cart is empty!');
+                    return;
+                }
+
+                // Build line items for Shopify checkout
+                const lineItems = cart.map(item => {
+                    const product = products.find(p => p.id === item.product.id);
+                    if (!product || !product.shopifyId) {
+                        console.error('Product not found or missing Shopify ID:', item);
+                        return null;
+                    }
+
+                    // Use first available variant or create a basic variant reference
+                    const variantId = product.variants && product.variants.length > 0 
+                        ? product.variants[0].id 
+                        : product.shopifyId;
+
+                    return {
+                        variantId: variantId,
+                        quantity: 1
+                    };
+                }).filter(item => item !== null);
+
+                if (lineItems.length === 0) {
+                    alert('Unable to create checkout. Please try again.');
+                    return;
+                }
+
+                // Create checkout using Shopify Storefront API
+                const response = await fetch(`https://${SHOPIFY_STORE_DOMAIN}/api/2024-01/graphql.json`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Shopify-Storefront-Access-Token': STOREFRONT_ACCESS_TOKEN
+                    },
+                    body: JSON.stringify({
+                        query: `
+                            mutation checkoutCreate($input: CheckoutCreateInput!) {
+                                checkoutCreate(input: $input) {
+                                    checkout {
+                                        id
+                                        webUrl
+                                    }
+                                    checkoutUserErrors {
+                                        message
+                                        field
+                                    }
+                                }
+                            }
+                        `,
+                        variables: {
+                            input: {
+                                lineItems: lineItems
+                            }
+                        }
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.data.checkoutCreate.checkoutUserErrors.length > 0) {
+                    console.error('Checkout errors:', data.data.checkoutCreate.checkoutUserErrors);
+                    alert('Error creating checkout. Please try again.');
+                    return;
+                }
+
+                const checkoutUrl = data.data.checkoutCreate.checkout.webUrl;
+                
+                // Redirect to Shopify checkout
+                window.location.href = checkoutUrl;
+
+            } catch (error) {
+                console.error('Error creating checkout:', error);
+                alert('Unable to proceed to checkout. Please try again.');
+            }
+        }
 
         // Insiders page functionality
         const insidersPage = document.getElementById('insidersPage');
@@ -1935,6 +2140,9 @@
             emailForm.querySelector('input').value = '';
             insidersPage.classList.remove('active');
         });
+
+        // Initialize the app
+        initApp();
     </script>
 </body>
 </html>
