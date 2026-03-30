@@ -151,6 +151,16 @@
             nav a {
                 font-size: 0.65rem;
             }
+
+            .thumbnail {
+                width: 60px;
+                height: 60px;
+            }
+
+            .image-thumbnails {
+                gap: 0.4rem;
+                margin-top: 0.5rem;
+            }
         }
 
         .product-container {
@@ -263,6 +273,53 @@
             color: #555;
             font-size: 1.2rem;
             letter-spacing: 0.1em;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .main-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .main-image .placeholder-text {
+            position: absolute;
+            z-index: 1;
+        }
+
+        .image-thumbnails {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .thumbnail {
+            width: 70px;
+            height: 70px;
+            background: #0d0d0d;
+            border: 2px solid #2a2a2a;
+            cursor: pointer;
+            transition: all 0.3s;
+            overflow: hidden;
+        }
+
+        .thumbnail:hover {
+            border-color: #ff3333;
+        }
+
+        .thumbnail.active {
+            border-color: #ff3333;
+            box-shadow: 0 0 10px rgba(255, 51, 51, 0.3);
+        }
+
+        .thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
         }
 
         .product-details {
@@ -890,8 +947,11 @@
 
         <div class="product-layout">
             <div class="product-images">
-                <div class="main-image">
-                    PRODUCT IMAGE
+                <div class="main-image" id="mainImage">
+                    <div class="placeholder-text">PRODUCT IMAGE</div>
+                </div>
+                <div class="image-thumbnails" id="imageThumbnails">
+                    <!-- Thumbnails will be dynamically added here -->
                 </div>
             </div>
 
@@ -1098,6 +1158,11 @@
 
         sizeOptions.forEach(option => {
             option.addEventListener('click', () => {
+                // Don't allow selecting sold out sizes
+                if (option.disabled || option.classList.contains('sold-out')) {
+                    return;
+                }
+                
                 sizeOptions.forEach(opt => opt.classList.remove('selected'));
                 option.classList.add('selected');
                 selectedSize = option.dataset.size;
@@ -1204,7 +1269,7 @@
                                                 currencyCode
                                             }
                                         }
-                                        images(first: 1) {
+                                        images(first: 5) {
                                             edges {
                                                 node {
                                                     url
@@ -1264,6 +1329,7 @@
                         soldOut: !product.availableForSale,
                         category: category,
                         image: product.images.edges[0]?.node.url || '',
+                        images: product.images.edges.map(edge => edge.node.url),
                         variants: product.variants.edges.map(v => ({
                             id: v.node.id,
                             title: v.node.title,
@@ -1311,6 +1377,12 @@
                 
                 // Update page title
                 document.title = `${product.name} - ARCETYPE`;
+
+                // Build image gallery
+                buildImageGallery(product);
+
+                // Handle size/variant availability
+                handleVariantAvailability(product);
             
             // Show sold out tag and disable add to cart if sold out
             if (product.soldOut) {
@@ -1331,6 +1403,77 @@
             // Default fallback
             console.log('No product ID or invalid ID');
         }
+    }
+
+    // Build image gallery with thumbnails
+    function buildImageGallery(product) {
+        const mainImage = document.getElementById('mainImage');
+        const thumbnailsContainer = document.getElementById('imageThumbnails');
+        
+        // Clear existing
+        mainImage.innerHTML = '';
+        thumbnailsContainer.innerHTML = '';
+        
+        if (!product.images || product.images.length === 0) {
+            mainImage.innerHTML = '<div class="placeholder-text">PRODUCT IMAGE</div>';
+            return;
+        }
+
+        // Set main image
+        const mainImg = document.createElement('img');
+        mainImg.src = product.images[0];
+        mainImg.alt = product.name;
+        mainImage.appendChild(mainImg);
+
+        // Only create thumbnails if there are 2+ images
+        if (product.images.length > 1) {
+            product.images.forEach((imageUrl, index) => {
+                const thumbnail = document.createElement('div');
+                thumbnail.className = 'thumbnail' + (index === 0 ? ' active' : '');
+                
+                const thumbImg = document.createElement('img');
+                thumbImg.src = imageUrl;
+                thumbImg.alt = `${product.name} - Image ${index + 1}`;
+                
+                thumbnail.appendChild(thumbImg);
+                thumbnail.addEventListener('click', () => {
+                    // Update main image
+                    mainImg.src = imageUrl;
+                    
+                    // Update active thumbnail
+                    thumbnailsContainer.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
+                    thumbnail.classList.add('active');
+                });
+                
+                thumbnailsContainer.appendChild(thumbnail);
+            });
+        }
+    }
+
+    // Handle size availability based on Shopify variants
+    function handleVariantAvailability(product) {
+        if (!product.variants || product.variants.length === 0) {
+            return; // No variants, all sizes available by default
+        }
+
+        sizeOptions.forEach(option => {
+            const size = option.dataset.size;
+            
+            // Find matching variant (case-insensitive)
+            const matchingVariant = product.variants.find(v => 
+                v.title.toUpperCase() === size || 
+                v.title.toUpperCase().includes(size)
+            );
+
+            if (matchingVariant && !matchingVariant.available) {
+                // This size is sold out
+                option.classList.add('sold-out');
+                option.disabled = true;
+                option.style.opacity = '0.3';
+                option.style.cursor = 'not-allowed';
+                option.style.textDecoration = 'line-through';
+            }
+        });
     }
 
     // Initialize the product page

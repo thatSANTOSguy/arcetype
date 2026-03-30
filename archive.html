@@ -510,6 +510,19 @@
             font-size: 1rem;
             letter-spacing: 0.1em;
             position: relative;
+            overflow: hidden;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .product-image .placeholder-text {
+            position: absolute;
+            z-index: 1;
         }
 
         .sold-out-overlay {
@@ -1052,6 +1065,7 @@
                         soldOut: !product.availableForSale,
                         category: category,
                         image: product.images.edges[0]?.node.url || '',
+                        images: product.images.edges.map(edge => edge.node.url),
                         variants: product.variants.edges.map(v => ({
                             id: v.node.id,
                             title: v.node.title,
@@ -1270,7 +1284,7 @@
                 <a href="product.html?id=${product.id}" class="product-card" data-category="${product.category}" data-sold-out="${product.soldOut}">
                     <div class="product-image">
                         ${product.soldOut ? '<div class="sold-out-overlay">SOLD OUT</div>' : ''}
-                        PRODUCT IMAGE
+                        ${product.image ? `<img src="${product.image}" alt="${product.name}">` : '<div class="placeholder-text">PRODUCT IMAGE</div>'}
                     </div>
                     <div class="product-info">
                         <div class="product-name">${product.name}</div>

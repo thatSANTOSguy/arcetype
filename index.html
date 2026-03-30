@@ -208,6 +208,14 @@
             font-size: 0.8rem;
         }
 
+        .product-image {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
         .product-name {
             font-size: 0.75rem;
             letter-spacing: 0.05em;
@@ -531,6 +539,11 @@
             justify-content: center;
             color: #fff;
             font-size: 1rem;
+            object-fit: cover;
+        }
+
+        img.dropped-item-img {
+            display: block;
         }
 
         .dropped-item .remove-btn {
@@ -1202,6 +1215,7 @@
                         soldOut: !product.availableForSale,
                         category: category,
                         image: product.images.edges[0]?.node.url || '',
+                        images: product.images.edges.map(edge => edge.node.url),
                         variants: product.variants.edges.map(v => ({
                             id: v.node.id,
                             title: v.node.title,
@@ -1295,7 +1309,7 @@
             div.dataset.productId = product.id;
             
             div.innerHTML = `
-                <div class="product-placeholder">ITEM ${product.id}</div>
+                ${product.image ? `<img src="${product.image}" alt="${product.name}" class="product-image">` : `<div class="product-placeholder">ITEM ${product.id}</div>`}
                 <div class="product-name">${product.name}</div>
                 <div class="product-price">${product.price}</div>
                 ${product.soldOut ? '<div class="sold-out-badge">SOLD OUT</div>' : ''}
@@ -1486,7 +1500,7 @@
             div.dataset.isBottoms = isBottoms;
             
             div.innerHTML = `
-                <div class="dropped-item-img">ITEM ${product.id}</div>
+                ${product.image ? `<img src="${product.image}" alt="${product.name}" class="dropped-item-img">` : `<div class="dropped-item-img">ITEM ${product.id}</div>`}
                 <div class="size-badge">${defaultSize}</div>
                 <div class="size-selector">
                     <button class="size-btn ${defaultSize === 'S' ? 'active' : ''}" data-size="S">S</button>
